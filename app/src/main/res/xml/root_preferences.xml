@@ -14,16 +14,6 @@
             android:summary="@string/notification_time_pref_summary"
             android:title="@string/notification_time_pref_title" />
 
-        <MultiSelectListPreference
-            android:key="@string/topic_selection_pref_key"
-            android:summary="@string/topic_selection_pref_summary"
-            android:title="@string/topic_selection_pref_title" />
-
-
-        <MultiSelectListPreference
-            android:key="@string/language_selection_pref_key"
-            android:summary="Ich möchte Beiträge in diesen Sprachen bekommen"
-            android:title="Sprachen" />
 
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/view">
@@ -36,10 +26,6 @@
             android:title="@string/show_in_app_pref_title" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/others">
-
-        <Preference android:title="@string/credentials">
-            <intent android:action="com.example.greenstream.activities.AccountActivity" />
-        </Preference>
 
         <Preference android:title="@string/imprint">
             <intent

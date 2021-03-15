@@ -2,15 +2,14 @@ package com.example.greenstream;
 
 import android.app.Application;
 import android.content.Intent;
-import android.net.Uri;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.greenstream.data.Information;
+import com.example.greenstream.preferences.AppPreferenceManager;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -21,10 +20,14 @@ public class Repository {
     private static volatile Repository INSTANCE;
 
     private final Application context;
+    private final AppPreferenceManager preferenceManager;
 
     private Repository(Application application) {
         Log.d(TAG, "Initializing Repository");
         context = application;
+        preferenceManager = new AppPreferenceManager(context, () -> {
+            //TODO: Update scheduler
+        });
     }
 
     /**

@@ -46,8 +46,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int itemId = item.getItemId();
         if (itemId == R.id.settings_menu_item)
-            // TODO: enable once settings are working
-            /*openSettings()*/;
+            openSettings();
         else
             return super.onOptionsItemSelected(item);
         return true;
