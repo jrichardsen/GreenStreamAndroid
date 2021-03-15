@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/view_help_item"
+        android:icon="@drawable/ic_help_outline_white_24dp"
+        android:title="@string/explanation"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/view_like_item"
+        android:icon="@drawable/ic_liked_off_24dp"
+        android:title="@string/like"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/view_share_item"
+        android:icon="@drawable/ic_share_white_24dp"
+        android:title="@string/share"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/view_feedback_item"
+        android:title="@string/feedback"
+        app:showAsAction="never" />
+
+</menu>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="information_feedback_items">
+        <item>Webseite lädt nicht</item>
+        <item>Unangemessener Inhalt</item>
+        <item>Schlechte Formulierung</item>
+        <item>Sonstiges</item>
+    </string-array>
+</resources>

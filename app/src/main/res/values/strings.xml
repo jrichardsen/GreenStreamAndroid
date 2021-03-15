@@ -1,0 +1,80 @@
+<resources>
+
+    <!-- App metadata -->
+    <string name="app_name">GreenStream</string>
+    <string name="channel_name">Green Stream</string>
+    <string name="channel_description">Tägliche Empfehlungen für nachhaltige Organisationen und Projekte</string>
+
+    <!-- Preference keys -->
+    <string name="daily_notification_pref_key">DAILY_NOTIFICATION_PREF_KEY</string>
+    <string name="notification_time_pref_key">NOTIFICATION_TIME_PREF_KEY</string>
+    <string name="topic_selection_pref_key">TOPIC_SELECTION_PREF_KEY</string>
+    <string name="data_timestamp_pref_key">DATA_TIMESTAMP_PREF_KEY</string>
+    <string name="user_data_timestamp_pref_key">USER_DATA_TIMESTAMP_PREF_KEY</string>
+    <string name="show_in_app_pref_key">SHOW_IN_APP_PREF_KEY</string>
+    <string name="language_selection_pref_key">LANGUAGE_SELECTION_PREF_KEY</string>
+    <string name="last_type_pref_key">LAST_TYPE_PREF_KEY</string>
+    <string name="last_topic_pref_key">LAST_TOPIC_PREF_KEY</string>
+    <string name="user_email_pref_key">USER_EMAIL_PREF_KEY</string>
+    <string name="user_password_pref_key">USER_PASSWORD_PREF_KEY</string>
+
+    <!-- Links -->
+    <string name="server_url">https://appsterdb.ackermann.digital/</string>
+    <string name="app_data_endpoint">api/full/</string>
+    <string name="feedback_endpoint">api/feedback/</string>
+    <string name="login_endpoint">login/</string>
+    <string name="user_data_endpoint">api/fullUser/</string>
+    <string name="imprint_url">https://appsterdb.ackermann.digital/impressum/</string>
+
+    <!-- Settings activity -->
+    <string name="title_activity_settings">Einstellungen</string>
+    <string name="daily_notification_pref_summary">Stelle mir jeden Tag einen tollen Beitrag zum Thema Nachhaltigkeit vor</string>
+    <string name="daily_notification_pref_title">Tägliche Benachrichtigungen</string>
+    <string name="notification_time_pref_summary">Tägliche Benachrichtigungen werden um ca. %1$02d.%2$02d Uhr angezeigt</string>
+    <string name="notification_time_pref_title">Zeit für Benachrichtigung</string>
+    <string name="topic_selection_pref_summary">Mich interessieren diese Themen</string>
+    <string name="topic_selection_pref_title">Persönliche Themenauswahl</string>
+    <string name="show_in_app_pref_title">Öffne Webseiten in der App</string>
+    <string name="show_in_app_pref_summary_off">Webseiten werden in der von dir bevorzugten App angezeigt</string>
+    <string name="show_in_app_pref_summary_on">Webseiten werden in dieser App angezeigt (Ausnahme: Videos)</string>
+    <string name="view">Anzeige</string>
+    <string name="show">Ansehen</string>
+    <string name="notifications">Benachrichtigungen</string>
+    <string name="explanation">Erklärung</string>
+    <string name="others">Sonstiges</string>
+    <string name="imprint">Impressum</string>
+    <string name="credentials">Account</string>
+
+    <!-- Main activity -->
+    <string name="like">Favoriten</string>
+    <string name="watch_later">Später ansehen</string>
+    <string name="history">Verlauf</string>
+    <string name="get_notification">Informiere mich</string>
+    <string name="information_notification_dialog_title">Ansehen?</string>
+    <string name="no">Nein</string>
+    <string name="later">Später</string>
+    <string name="yes">Ja</string>
+    <string name="update">Aktualisierung</string>
+
+    <!-- View activity -->
+    <string name="share">Teilen</string>
+    <string name="feedback">Feedback</string>
+    <string name="cancel">Abbrechen</string>
+    <string name="send">Senden</string>
+    <string name="information_feedback_message">Bitte hier nur Feedback zu diesem Beitrag geben</string>
+    <string name="feedback_received_success">Vielen Dank für das Feedback!</string>
+    <string name="feedback_received_failed">Feedback konnte nicht gesendet werden!</string>
+    <string name="open_external">Im Browser öffnen</string>
+
+    <!-- Account activity -->
+    <string name="email">Email</string>
+    <string name="password">Passwort</string>
+    <string name="login_failed">Anmeldung fehlgeschlagen!</string>
+    <string name="login">Login</string>
+    <string name="log_out_question">Willst du dich wirklich ausloggen?</string>
+    <string name="login_to_synchronize">Login to synchronize</string>
+    <string name="log_out">Log Out</string>
+    <string name="logged_out_warning">You are not logged in. Your preferences and viewing history will not be synchronized with the server!</string>
+    <string name="logged_in_status">You are logged in as user \"%1$s\". Your preferences and viewing history will be synchronized with the server!</string>
+
+</resources>
