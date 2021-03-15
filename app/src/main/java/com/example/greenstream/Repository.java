@@ -7,7 +7,9 @@ import android.util.Log;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.example.greenstream.alarm.AppAlarmManager;
 import com.example.greenstream.data.Information;
+import com.example.greenstream.notifications.AppNotificationManager;
 import com.example.greenstream.preferences.AppPreferenceManager;
 
 import java.util.Arrays;
@@ -21,13 +23,16 @@ public class Repository {
 
     private final Application context;
     private final AppPreferenceManager preferenceManager;
+    private final AppAlarmManager alarmManager;
+    private final AppNotificationManager notificationManager;
 
     private Repository(Application application) {
         Log.d(TAG, "Initializing Repository");
         context = application;
-        preferenceManager = new AppPreferenceManager(context, () -> {
-            //TODO: Update scheduler
-        });
+        alarmManager = new AppAlarmManager();
+        notificationManager = new AppNotificationManager(context);
+        preferenceManager = new AppPreferenceManager(context, this::updateAlarm);
+        updateAlarm();
     }
 
     /**
@@ -200,13 +205,42 @@ public class Repository {
         ));
     }
 
-
+    public void updateAlarm() {
+        alarmManager.setAlarmEnabled(
+                context,
+                preferenceManager.dailyNotificationsEnabled(),
+                preferenceManager.getNotificationTime()
+        );
+    }
 
     public void showInformation(Information information) {
         Intent intent;
     }
 
     public void sendItemFeedback(long id, String feedbackOption, Repository.FeedbackReceivedCallback callback) {
+        //TODO: implement method
+    }
+
+    public void changeWatchLater(long id, boolean b) {
+        //TODO: implement method
+    }
+
+    public void cancelNotification() {
+        notificationManager.cancelNotification();
+    }
+
+    public void notifyInformation() {
+        //TODO: retrieve information for notification
+        Information information = new Information(
+                135,
+                "https://www.quarks.de/gesundheit/ernaehrung/alles-bio-warum-unsere-fleischwahl-nur-wenig-beeinflusst/",
+                "Bio-Fleisch",
+                "Ist Bio-Fleisch wirklich besser? - Quarks",
+                "de",
+                "Lebensmittel",
+                "Artikel"
+        );
+        notificationManager.notifyInformation(information);
     }
 
     public interface FeedbackReceivedCallback {

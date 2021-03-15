@@ -1,6 +1,9 @@
 package com.example.greenstream.data;
 
-public class Information {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class Information implements Parcelable {
 
     private long id;
 
@@ -22,6 +25,33 @@ public class Information {
     private boolean watched;
 
     private boolean onWatchLaterList;
+
+    public static final Creator<Information> CREATOR = new Creator<Information>() {
+        @Override
+        public Information createFromParcel(Parcel in) {
+            return new Information(in);
+        }
+
+        @Override
+        public Information[] newArray(int size) {
+            return new Information[size];
+        }
+    };
+
+    protected Information(Parcel in) {
+        id = in.readLong();
+        url = in.readString();
+        title = in.readString();
+        description = in.readString();
+        simple = in.readByte() != 0;
+        language = in.readString();
+        topic = in.readString();
+        type = in.readString();
+        lastRecommended = in.readLong();
+        liked = in.readByte() != 0;
+        watched = in.readByte() != 0;
+        onWatchLaterList = in.readByte() != 0;
+    }
 
     public Information(long id, String url, String title, String description, String language, String topic, String type) {
         this.id = id;
@@ -127,5 +157,26 @@ public class Information {
 
     public void setOnWatchLaterList(boolean onWatchLaterList) {
         this.onWatchLaterList = onWatchLaterList;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeLong(id);
+        parcel.writeString(url);
+        parcel.writeString(title);
+        parcel.writeString(description);
+        parcel.writeByte((byte) (simple ? 1 : 0));
+        parcel.writeString(language);
+        parcel.writeString(topic);
+        parcel.writeString(type);
+        parcel.writeLong(lastRecommended);
+        parcel.writeByte((byte) (liked ? 1 : 0));
+        parcel.writeByte((byte) (watched ? 1 : 0));
+        parcel.writeByte((byte) (onWatchLaterList ? 1 : 0));
     }
 }
