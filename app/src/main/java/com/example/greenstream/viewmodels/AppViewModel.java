@@ -7,6 +7,10 @@ import androidx.lifecycle.AndroidViewModel;
 
 import com.example.greenstream.Repository;
 
+/**
+ * Default view model. Only retrieves the repository,
+ * everything else is left to the specific view model implementations.
+ */
 public class AppViewModel extends AndroidViewModel {
 
     protected Repository repository;

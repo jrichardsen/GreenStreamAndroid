@@ -2,6 +2,7 @@ package com.example.greenstream.preferences;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import androidx.preference.PreferenceManager;
 
@@ -9,6 +10,9 @@ import com.example.greenstream.R;
 
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Class for managing the app's {@link SharedPreferences}.
+ */
 public class AppPreferenceManager implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     private static final String TAG = "AppPreferenceManager";
@@ -34,7 +38,8 @@ public class AppPreferenceManager implements SharedPreferences.OnSharedPreferenc
     }
 
     public TimePreference.TimeData getNotificationTime() {
-        return TimePreference.parseTimeData(sharedPreferences.getString(NOTIFICATION_TIME_PREF_KEY, "12:00"));
+        return TimePreference.parseTimeData(
+                sharedPreferences.getString(NOTIFICATION_TIME_PREF_KEY, "12:00"));
     }
 
     public boolean showInApp() {
@@ -43,6 +48,7 @@ public class AppPreferenceManager implements SharedPreferences.OnSharedPreferenc
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, @NotNull String s) {
+        Log.d(TAG, "Shared preferences have been updated");
         listener.onSchedulingPreferencesUpdated();
     }
 

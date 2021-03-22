@@ -10,6 +10,10 @@ import com.example.greenstream.Repository;
 
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Receiver for the notification alarm.
+ * Whenever it receives an alarm, the repository will make a notification for an information item.
+ */
 public class AlarmReceiver extends BroadcastReceiver {
 
     private static final String TAG = "AlarmReceiver";

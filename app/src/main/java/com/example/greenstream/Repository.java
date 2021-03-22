@@ -2,19 +2,23 @@ package com.example.greenstream;
 
 import android.app.Application;
 import android.content.Intent;
+import android.net.Uri;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.greenstream.alarm.AppAlarmManager;
-import com.example.greenstream.data.Information;
+import com.example.greenstream.data.InformationItem;
 import com.example.greenstream.notifications.AppNotificationManager;
 import com.example.greenstream.preferences.AppPreferenceManager;
 
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Repository that manages access to all data for this application.
+ */
 public class Repository {
 
     private static final String TAG = "Repository";
@@ -51,14 +55,14 @@ public class Repository {
         return INSTANCE;
     }
 
-    public LiveData<List<Information>> getRecommendations() {
+    public LiveData<List<InformationItem>> getRecommendations() {
         return sampleInformation();
     }
 
     //TODO: only for testing, remove later
-    private LiveData<List<Information>> sampleInformation() {
+    private LiveData<List<InformationItem>> sampleInformation() {
         return new MutableLiveData<>(Arrays.asList(
-                new Information(
+                new InformationItem(
                         135,
                         "https://www.quarks.de/gesundheit/ernaehrung/alles-bio-warum-unsere-fleischwahl-nur-wenig-beeinflusst/",
                         "Bio-Fleisch",
@@ -67,7 +71,7 @@ public class Repository {
                         "Lebensmittel",
                         "Artikel"
                 ),
-                new Information(
+                new InformationItem(
                         135,
                         "https://www.quarks.de/gesundheit/ernaehrung/alles-bio-warum-unsere-fleischwahl-nur-wenig-beeinflusst/",
                         "Bio-Fleisch",
@@ -76,7 +80,7 @@ public class Repository {
                         "Lebensmittel",
                         "Artikel"
                 ),
-                new Information(
+                new InformationItem(
                         135,
                         "https://www.quarks.de/gesundheit/ernaehrung/alles-bio-warum-unsere-fleischwahl-nur-wenig-beeinflusst/",
                         "Bio-Fleisch",
@@ -85,7 +89,7 @@ public class Repository {
                         "Lebensmittel",
                         "Artikel"
                 ),
-                new Information(
+                new InformationItem(
                         135,
                         "https://www.quarks.de/gesundheit/ernaehrung/alles-bio-warum-unsere-fleischwahl-nur-wenig-beeinflusst/",
                         "Bio-Fleisch",
@@ -94,7 +98,7 @@ public class Repository {
                         "Lebensmittel",
                         "Artikel"
                 ),
-                new Information(
+                new InformationItem(
                         135,
                         "https://www.quarks.de/gesundheit/ernaehrung/alles-bio-warum-unsere-fleischwahl-nur-wenig-beeinflusst/",
                         "Bio-Fleisch",
@@ -103,7 +107,7 @@ public class Repository {
                         "Lebensmittel",
                         "Artikel"
                 ),
-                new Information(
+                new InformationItem(
                         135,
                         "https://www.quarks.de/gesundheit/ernaehrung/alles-bio-warum-unsere-fleischwahl-nur-wenig-beeinflusst/",
                         "Bio-Fleisch",
@@ -112,7 +116,7 @@ public class Repository {
                         "Lebensmittel",
                         "Artikel"
                 ),
-                new Information(
+                new InformationItem(
                         135,
                         "https://www.quarks.de/gesundheit/ernaehrung/alles-bio-warum-unsere-fleischwahl-nur-wenig-beeinflusst/",
                         "Bio-Fleisch",
@@ -121,7 +125,7 @@ public class Repository {
                         "Lebensmittel",
                         "Artikel"
                 ),
-                new Information(
+                new InformationItem(
                         135,
                         "https://www.quarks.de/gesundheit/ernaehrung/alles-bio-warum-unsere-fleischwahl-nur-wenig-beeinflusst/",
                         "Bio-Fleisch",
@@ -130,7 +134,7 @@ public class Repository {
                         "Lebensmittel",
                         "Artikel"
                 ),
-                new Information(
+                new InformationItem(
                         135,
                         "https://www.quarks.de/gesundheit/ernaehrung/alles-bio-warum-unsere-fleischwahl-nur-wenig-beeinflusst/",
                         "Bio-Fleisch",
@@ -139,7 +143,7 @@ public class Repository {
                         "Lebensmittel",
                         "Artikel"
                 ),
-                new Information(
+                new InformationItem(
                         135,
                         "https://www.quarks.de/gesundheit/ernaehrung/alles-bio-warum-unsere-fleischwahl-nur-wenig-beeinflusst/",
                         "Bio-Fleisch",
@@ -148,7 +152,7 @@ public class Repository {
                         "Lebensmittel",
                         "Artikel"
                 ),
-                new Information(
+                new InformationItem(
                         135,
                         "https://www.quarks.de/gesundheit/ernaehrung/alles-bio-warum-unsere-fleischwahl-nur-wenig-beeinflusst/",
                         "Bio-Fleisch",
@@ -157,7 +161,7 @@ public class Repository {
                         "Lebensmittel",
                         "Artikel"
                 ),
-                new Information(
+                new InformationItem(
                         135,
                         "https://www.quarks.de/gesundheit/ernaehrung/alles-bio-warum-unsere-fleischwahl-nur-wenig-beeinflusst/",
                         "Bio-Fleisch",
@@ -166,7 +170,7 @@ public class Repository {
                         "Lebensmittel",
                         "Artikel"
                 ),
-                new Information(
+                new InformationItem(
                         135,
                         "https://www.quarks.de/gesundheit/ernaehrung/alles-bio-warum-unsere-fleischwahl-nur-wenig-beeinflusst/",
                         "Bio-Fleisch",
@@ -175,7 +179,7 @@ public class Repository {
                         "Lebensmittel",
                         "Artikel"
                 ),
-                new Information(
+                new InformationItem(
                         135,
                         "https://www.quarks.de/gesundheit/ernaehrung/alles-bio-warum-unsere-fleischwahl-nur-wenig-beeinflusst/",
                         "Bio-Fleisch",
@@ -184,7 +188,7 @@ public class Repository {
                         "Lebensmittel",
                         "Artikel"
                 ),
-                new Information(
+                new InformationItem(
                         135,
                         "https://www.quarks.de/gesundheit/ernaehrung/alles-bio-warum-unsere-fleischwahl-nur-wenig-beeinflusst/",
                         "Bio-Fleisch",
@@ -193,7 +197,7 @@ public class Repository {
                         "Lebensmittel",
                         "Artikel"
                 ),
-                new Information(
+                new InformationItem(
                         135,
                         "https://www.quarks.de/gesundheit/ernaehrung/alles-bio-warum-unsere-fleischwahl-nur-wenig-beeinflusst/",
                         "Bio-Fleisch",
@@ -213,8 +217,12 @@ public class Repository {
         );
     }
 
-    public void showInformation(Information information) {
-        Intent intent;
+    public void showInformation(InformationItem informationItem) {
+        //TODO: update watched timestamp
+        Intent intent = new Intent(Intent.ACTION_VIEW)
+                .setData(Uri.parse(informationItem.getUrl()))
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
     }
 
     public void sendItemFeedback(long id, String feedbackOption, Repository.FeedbackReceivedCallback callback) {
@@ -231,7 +239,7 @@ public class Repository {
 
     public void notifyInformation() {
         //TODO: retrieve information for notification
-        Information information = new Information(
+        InformationItem informationItem = new InformationItem(
                 135,
                 "https://www.quarks.de/gesundheit/ernaehrung/alles-bio-warum-unsere-fleischwahl-nur-wenig-beeinflusst/",
                 "Bio-Fleisch",
@@ -240,7 +248,7 @@ public class Repository {
                 "Lebensmittel",
                 "Artikel"
         );
-        notificationManager.notifyInformation(information);
+        notificationManager.notifyInformation(informationItem);
     }
 
     public interface FeedbackReceivedCallback {

@@ -2,7 +2,7 @@ package com.example.greenstream.adapters;
 
 import androidx.annotation.IntDef;
 
-import com.example.greenstream.data.Information;
+import com.example.greenstream.data.InformationItem;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -13,7 +13,7 @@ public class TabbedInformationAdapter extends InformationAdapter {
 
     private int mode = Mode.WATCH_LATER;
 
-    private List<Information>
+    private List<InformationItem>
             watchLater = new ArrayList<>(),
             liked = new ArrayList<>(),
             history = new ArrayList<>();
@@ -22,26 +22,26 @@ public class TabbedInformationAdapter extends InformationAdapter {
         super(itemClickListener);
     }
 
-    public void setLiked(List<Information> data) {
+    public void setLiked(List<InformationItem> data) {
         this.liked = data;
         if (mode == Mode.LIKED)
             notifyDataSetChanged();
     }
 
-    public void setHistory(List<Information> data) {
+    public void setHistory(List<InformationItem> data) {
         this.history = data;
         if (mode == Mode.HISTORY)
             notifyDataSetChanged();
     }
 
-    public void setWatchLater(List<Information> data) {
+    public void setWatchLater(List<InformationItem> data) {
         this.watchLater = data;
         if (mode == Mode.WATCH_LATER)
             notifyDataSetChanged();
     }
 
     @Override
-    protected List<Information> data() {
+    protected List<InformationItem> data() {
         switch (mode) {
             case Mode.LIKED:
                 return liked;
@@ -54,7 +54,7 @@ public class TabbedInformationAdapter extends InformationAdapter {
         }
     }
 
-    public Information getDataAt(int i) {
+    public InformationItem getDataAt(int i) {
         if (0 <= i && i < data().size())
             return data().get(i);
         return null;

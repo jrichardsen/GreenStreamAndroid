@@ -2,11 +2,15 @@ package com.example.greenstream.preferences;
 
 import android.content.Context;
 import android.os.Build;
+import android.os.Bundle;
 import android.view.View;
 import android.widget.TimePicker;
 
 import androidx.preference.PreferenceDialogFragmentCompat;
 
+/**
+ * Dialog for picking a time of day. Used by {@link TimePreference}.
+ */
 public class TimePreferenceDialogFragmentCompat extends PreferenceDialogFragmentCompat {
     private TimePicker timePicker = null;
 
@@ -21,8 +25,8 @@ public class TimePreferenceDialogFragmentCompat extends PreferenceDialogFragment
         super.onBindDialogView(v);
         timePicker.setIs24HourView(true);
         TimePreference pref = (TimePreference) getPreference();
-        timePicker.setCurrentHour(pref.getHour());
-        timePicker.setCurrentMinute(pref.getMinute());
+        timePicker.setCurrentHour(pref.getTime().getHour());
+        timePicker.setCurrentMinute(pref.getTime().getMinute());
     }
 
     @Override
@@ -38,5 +42,19 @@ public class TimePreferenceDialogFragmentCompat extends PreferenceDialogFragment
             }
             ((TimePreference) getPreference()).setNewTime(hour, minute);
         }
+    }
+
+    /**
+     * Creates a dialog for the given preference.
+     */
+    public static TimePreferenceDialogFragmentCompat createFromPreference(
+            TimePreference preference) {
+        TimePreferenceDialogFragmentCompat dialogFragment =
+                new TimePreferenceDialogFragmentCompat();
+        //TODO: test if this is necessary
+        Bundle bundle = new Bundle(1);
+        bundle.putString("key", preference.getKey());
+        dialogFragment.setArguments(bundle);
+        return dialogFragment;
     }
 }

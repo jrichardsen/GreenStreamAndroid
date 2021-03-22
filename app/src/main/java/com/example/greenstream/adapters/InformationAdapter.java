@@ -11,15 +11,23 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.greenstream.R;
-import com.example.greenstream.data.Information;
+import com.example.greenstream.data.InformationItem;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class InformationAdapter extends RecyclerView.Adapter<InformationAdapter.InformationViewHolder> {
+/**
+ * Adapter for displaying information items within a {@link RecyclerView}.
+ */
+public class InformationAdapter
+        extends RecyclerView.Adapter<InformationAdapter.InformationViewHolder> {
 
-    private List<Information> data;
+    private List<InformationItem> data;
+    /**
+     * The view holder for the view that was last clicked.
+     * This view is the only one that might show their actions.
+     */
     private InformationViewHolder lastSelectedViewHolder = null;
     private final ItemActionListener listener;
 
@@ -27,12 +35,12 @@ public class InformationAdapter extends RecyclerView.Adapter<InformationAdapter.
         listener = itemClickListener;
     }
 
-    public void setData(List<Information> data) {
+    public void setData(List<InformationItem> data) {
         this.data = data;
         notifyDataSetChanged();
     }
 
-    protected List<Information> data() {
+    protected List<InformationItem> data() {
         return data;
     }
 
@@ -54,11 +62,18 @@ public class InformationAdapter extends RecyclerView.Adapter<InformationAdapter.
         return data().size();
     }
 
+    /**
+     * If a view was clicked, toggle the visibility of its actions.
+     * If another view was showing their actions beforehand, these must now be set invisible.
+     * @param viewHolder The view holder that was clicked
+     */
     private void onItemClicked(InformationViewHolder viewHolder) {
         if (viewHolder.equals(lastSelectedViewHolder))
+            // Toggle visibility for actions
             viewHolder.setActionsVisible(!viewHolder.areActionsVisible());
         else {
             if (lastSelectedViewHolder != null)
+                // Set actions of the last view invisible
                 lastSelectedViewHolder.setActionsVisible(false);
             viewHolder.setActionsVisible(true);
             lastSelectedViewHolder = viewHolder;
@@ -71,11 +86,14 @@ public class InformationAdapter extends RecyclerView.Adapter<InformationAdapter.
 
     public interface ItemActionListener {
 
-        void onFeedbackAction(Information information);
+        void onFeedbackAction(InformationItem informationItem);
 
-        void onShowAction(Information information);
+        void onShowAction(InformationItem informationItem);
     }
 
+    /**
+     * Class representing the view holder of this adapter.
+     */
     static class InformationViewHolder extends RecyclerView.ViewHolder {
 
         private final TextView titleText;
@@ -98,13 +116,13 @@ public class InformationAdapter extends RecyclerView.Adapter<InformationAdapter.
             showButton = itemView.findViewById(R.id.show_button);
         }
 
-        private void bind(@NotNull Information information, ItemActionListener listener) {
-            titleText.setText(information.getTitle());
-            typeText.setText(information.getType());
-            descriptionText.setText(information.getDescription());
+        private void bind(@NotNull InformationItem informationItem, ItemActionListener listener) {
+            titleText.setText(informationItem.getTitle());
+            typeText.setText(informationItem.getType());
+            descriptionText.setText(informationItem.getDescription());
             setActionsVisible(false);
-            feedbackButton.setOnClickListener(view -> listener.onFeedbackAction(information));
-            showButton.setOnClickListener(view -> listener.onShowAction(information));
+            feedbackButton.setOnClickListener(view -> listener.onFeedbackAction(informationItem));
+            showButton.setOnClickListener(view -> listener.onShowAction(informationItem));
         }
 
         private void setActionsVisible(boolean visible) {

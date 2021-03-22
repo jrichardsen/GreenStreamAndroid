@@ -16,8 +16,15 @@ import androidx.appcompat.app.AlertDialog;
 import com.example.greenstream.R;
 import com.example.greenstream.Repository;
 
+/**
+ * Utility class for creating dialogs.
+ */
 public class AppDialogBuilder {
 
+    /**
+     * Creates a feedback dialog in the given context for the information item with the given id.
+     * A selection between predefined options and a custom text feedback can be made.
+     */
     public static AlertDialog feedbackDialog(Context context, long id) {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -27,6 +34,7 @@ public class AppDialogBuilder {
                 .setItems(R.array.information_feedback_items, (dialogInterface, i) -> {
                     String[] feedbackOptions = context.getResources().getStringArray(R.array.information_feedback_items);
                     if (i == feedbackOptions.length - 1)
+                        // The last item requires a custom message to be entered.
                         feedbackTextDialog(context, id).show();
                     else
                         Repository.getInstance((Application) context.getApplicationContext())
@@ -35,6 +43,10 @@ public class AppDialogBuilder {
                 .create();
     }
 
+    /**
+     * Creates a custom text feedback dialog in the given context for the information item with the
+     * given id.
+     */
     private static AlertDialog feedbackTextDialog(Context context, long id) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         Repository.FeedbackReceivedCallback callback = getCallbackFromContext(context);
@@ -64,6 +76,9 @@ public class AppDialogBuilder {
                 .create();
     }
 
+    /**
+     * Creates {@link Toast} messages to notify the user whether the feedback could be send.
+     */
     private static Repository.FeedbackReceivedCallback getCallbackFromContext(Context context) {
         return new Repository.FeedbackReceivedCallback() {
             @Override
@@ -73,7 +88,10 @@ public class AppDialogBuilder {
 
             @Override
             public void onFeedbackFailed() {
-                Toast.makeText(context, R.string.feedback_received_failed, Toast.LENGTH_SHORT).show();
+                Toast.makeText(context,
+                        R.string.feedback_received_failed,
+                        Toast.LENGTH_SHORT
+                ).show();
             }
         };
     }

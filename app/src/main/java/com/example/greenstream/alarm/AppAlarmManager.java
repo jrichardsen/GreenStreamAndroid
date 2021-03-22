@@ -24,13 +24,19 @@ public class AppAlarmManager extends BroadcastReceiver {
 
     private static final String TAG = "AppAlarmManager";
 
+    private static final int ALARM_REQUEST_CODE = 0;
+
     public void setAlarmEnabled(Context context, boolean enabled, TimePreference.TimeData time) {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         if (alarmManager == null)
             throw new RuntimeException("Could not get system alarm manager");
 
         Intent intent = new Intent(context, AlarmReceiver.class);
-        PendingIntent alarmIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
+        PendingIntent alarmIntent = PendingIntent.getBroadcast(context,
+                ALARM_REQUEST_CODE,
+                intent,
+                0
+        );
 
         Calendar now = Calendar.getInstance();
         Calendar alarmCalendar = Calendar.getInstance();
@@ -48,7 +54,9 @@ public class AppAlarmManager extends BroadcastReceiver {
                     alarmIntent
             );
             Log.d(TAG, "Next notification due in approximately "
-                    + (alarmCalendar.getTimeInMillis() - now.getTimeInMillis()) / 1000 + " seconds");
+                    + (alarmCalendar.getTimeInMillis() - now.getTimeInMillis()) / 1000
+                    + " seconds"
+            );
         } else {
             Log.d(TAG, "Notification alarm disabled");
             alarmManager.cancel(alarmIntent);
@@ -58,7 +66,7 @@ public class AppAlarmManager extends BroadcastReceiver {
 
     }
 
-    private void setBootReceiverEnabled(Context context, boolean enabled) {
+    private static void setBootReceiverEnabled(Context context, boolean enabled) {
         ComponentName receiver = new ComponentName(context, AppAlarmManager.class);
         PackageManager pm = context.getPackageManager();
 
@@ -72,9 +80,11 @@ public class AppAlarmManager extends BroadcastReceiver {
 
     @Override
     public void onReceive(@NotNull Context context, @NotNull Intent intent) {
-        if (intent.getAction() != null && intent.getAction().equals("android.intent.action.BOOT_COMPLETED"))
-            // This calls update alarm twice, as it is already being called within the constructor of the repository,
-            // second time is only to guarantee it is still updated even if the first call was removed in a future update
+        // Reverse equals to include null check for getAction()
+        if (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction()))
+            // This calls update alarm twice, as it is already being called
+            // within the constructor of the repository, second time is only to guarantee
+            // it is still updated even if the first call was removed in a future update
             Repository.getInstance((Application) context.getApplicationContext()).updateAlarm();
     }
 }

@@ -1,23 +1,30 @@
 package com.example.greenstream.activities;
 
-import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
 import com.example.greenstream.R;
 import com.example.greenstream.preferences.TimePreference;
 import com.example.greenstream.preferences.TimePreferenceDialogFragmentCompat;
-import com.example.greenstream.viewmodels.SettingsViewModel;
 
+/**
+ * Class representing the activity that manages the settings of the app.
+ *
+ */
 public class SettingsActivity extends AppCompatActivity {
+
+    private static final String TAG = "SettingsActivity";
+
+    private static final int TIME_PREF_REQUEST_CODE = 0;
+    private static final String TIME_PREF_TAG = "TimePreferenceDialog";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,33 +38,29 @@ public class SettingsActivity extends AppCompatActivity {
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+        Log.d(TAG, "Activity created");
     }
 
     public static class SettingsFragment extends PreferenceFragmentCompat {
-
-        SettingsViewModel viewModel;
-
-        @Override
-        public void onAttach(@NonNull Context context) {
-            super.onAttach(context);
-            viewModel = new ViewModelProvider((SettingsActivity) context).get(SettingsViewModel.class);
-        }
 
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey);
         }
 
+        /**
+         * Set custom procedure for launching the {@link TimePreference} dialog.
+         * @param preference If this is a {@link TimePreference}, the respective custom
+         *                   {@link TimePreferenceDialogFragmentCompat dialog} will be created,
+         *                   otherwise it will use the default behaviour.
+         */
         @Override
         public void onDisplayPreferenceDialog(Preference preference) {
-            DialogFragment dialogFragment;
             if (preference instanceof TimePreference) {
-                dialogFragment = new TimePreferenceDialogFragmentCompat();
-                Bundle bundle = new Bundle(1);
-                bundle.putString("key", preference.getKey());
-                dialogFragment.setArguments(bundle);
-                dialogFragment.setTargetFragment(this, 0);
-                dialogFragment.show(getParentFragmentManager(), "TimePreference");
+                DialogFragment dialogFragment = TimePreferenceDialogFragmentCompat
+                        .createFromPreference((TimePreference) preference);
+                dialogFragment.setTargetFragment(this, TIME_PREF_REQUEST_CODE);
+                dialogFragment.show(getParentFragmentManager(), TIME_PREF_TAG);
             } else {
                 super.onDisplayPreferenceDialog(preference);
             }
@@ -69,6 +72,7 @@ public class SettingsActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
+                // React to UI back button (in top bar) as if physical back button was pressed
                 onBackPressed();
                 return true;
             default:

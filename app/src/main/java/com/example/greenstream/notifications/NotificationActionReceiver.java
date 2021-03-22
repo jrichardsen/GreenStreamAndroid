@@ -7,11 +7,14 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.example.greenstream.Repository;
-import com.example.greenstream.data.Information;
+import com.example.greenstream.data.InformationItem;
 
 import org.jetbrains.annotations.NotNull;
 
-public class ActionReceiver extends BroadcastReceiver {
+/**
+ * Responds to actions taken on item notifications.
+ */
+public class NotificationActionReceiver extends BroadcastReceiver {
 
     private static final String TAG = "ActionReceiver";
 
@@ -23,17 +26,18 @@ public class ActionReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(@NotNull Context context, @NotNull Intent intent) {
-        Information information = intent.getParcelableExtra(INFORMATION_EXTRA);
+        InformationItem informationItem = intent.getParcelableExtra(INFORMATION_EXTRA);
         Repository repository = Repository.getInstance((Application) context.getApplicationContext());
-        if (information != null)
+        if (informationItem != null)
             switch (intent.getIntExtra(ACTION_TYPE_EXTRA, ACTION_TYPE_SHOW)) {
                 case ACTION_TYPE_SHOW:
                     Log.d(TAG, "Showing notification");
-                    repository.showInformation(information);
+                    repository.showInformation(informationItem);
                     break;
                 case ACTION_TYPE_WATCH_LATER:
                     Log.d(TAG, "Adding notification to watch later");
-                    repository.changeWatchLater(information.getId(), true);
+                    repository.changeWatchLater(informationItem.getId(), true);
+                    // remove the notification
                     repository.cancelNotification();
                     break;
             }
