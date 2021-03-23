@@ -118,7 +118,7 @@ public class InformationAdapter
 
         private void bind(@NotNull InformationItem informationItem, ItemActionListener listener) {
             titleText.setText(informationItem.getTitle());
-            typeText.setText(informationItem.getType());
+            typeText.setText(informationItem.getType().getName());
             descriptionText.setText(informationItem.getDescription());
             setActionsVisible(false);
             feedbackButton.setOnClickListener(view -> listener.onFeedbackAction(informationItem));

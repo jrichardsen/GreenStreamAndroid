@@ -8,6 +8,7 @@ import android.util.Log;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.example.greenstream.activities.ViewActivity;
 import com.example.greenstream.alarm.AppAlarmManager;
 import com.example.greenstream.data.InformationItem;
 import com.example.greenstream.notifications.AppNotificationManager;
@@ -219,9 +220,15 @@ public class Repository {
 
     public void showInformation(InformationItem informationItem) {
         //TODO: update watched timestamp
-        Intent intent = new Intent(Intent.ACTION_VIEW)
-                .setData(Uri.parse(informationItem.getUrl()))
-                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        Intent intent;
+        if (!informationItem.getType().isViewExternal() && preferenceManager.showInApp()) {
+            intent = new Intent(context, ViewActivity.class);
+            intent.putExtra(ViewActivity.INFORMATION_EXTRA, informationItem);
+        } else {
+            intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(Uri.parse(informationItem.getUrl()));
+        }
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
     }
 
@@ -249,6 +256,16 @@ public class Repository {
                 "Artikel"
         );
         notificationManager.notifyInformation(informationItem);
+    }
+
+    public void setLikeState(long id, boolean liked) {
+        //TODO: implement this
+    }
+
+    public void showInformationById(long id) {
+        InformationItem informationItem;
+        //TODO: get the information item for the given id
+        //showInformation(informationItem);
     }
 
     public interface FeedbackReceivedCallback {

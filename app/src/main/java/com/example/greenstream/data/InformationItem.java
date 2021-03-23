@@ -12,9 +12,10 @@ public class InformationItem implements Parcelable {
     private String url;
     private String title;
     private String description;
-    private String language;
-    private String topic;
-    private String type;
+    private Language language;
+    private Topic topic;
+    private Type type;
+    private int explanation;
 
     public static final Creator<InformationItem> CREATOR = new Creator<InformationItem>() {
         @Override
@@ -33,9 +34,10 @@ public class InformationItem implements Parcelable {
         url = in.readString();
         title = in.readString();
         description = in.readString();
-        language = in.readString();
-        topic = in.readString();
-        type = in.readString();
+        language = in.readParcelable(Language.class.getClassLoader());
+        topic = in.readParcelable(Topic.class.getClassLoader());
+        type = in.readParcelable(Type.class.getClassLoader());
+        explanation = in.readInt();
     }
 
     public InformationItem(long id, String url, String title, String description, String language, String topic, String type) {
@@ -43,9 +45,29 @@ public class InformationItem implements Parcelable {
         this.url = url;
         this.title = title;
         this.description = description;
-        this.language = language;
-        this.topic = topic;
-        this.type = type;
+        this.language = new Language();
+        this.language.setName(language);
+        this.topic = new Topic();
+        this.topic.setName(topic);
+        this.type = new Type();
+        this.type.setName(type);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeLong(id);
+        parcel.writeString(url);
+        parcel.writeString(title);
+        parcel.writeString(description);
+        parcel.writeParcelable(language, i);
+        parcel.writeParcelable(topic, i);
+        parcel.writeParcelable(type, i);
+        parcel.writeInt(explanation);
     }
 
     public long getId() {
@@ -80,43 +102,35 @@ public class InformationItem implements Parcelable {
         this.description = description;
     }
 
-    public String getLanguage() {
+    public Language getLanguage() {
         return language;
     }
 
-    public void setLanguage(String language) {
+    public void setLanguage(Language language) {
         this.language = language;
     }
 
-    public String getTopic() {
+    public Topic getTopic() {
         return topic;
     }
 
-    public void setTopic(String topic) {
+    public void setTopic(Topic topic) {
         this.topic = topic;
     }
 
-    public String getType() {
+    public Type getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(Type type) {
         this.type = type;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
+    public int getExplanation() {
+        return explanation;
     }
 
-    @Override
-    public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeLong(id);
-        parcel.writeString(url);
-        parcel.writeString(title);
-        parcel.writeString(description);
-        parcel.writeString(language);
-        parcel.writeString(topic);
-        parcel.writeString(type);
+    public void setExplanation(int explanation) {
+        this.explanation = explanation;
     }
 }

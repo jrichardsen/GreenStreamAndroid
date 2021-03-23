@@ -25,4 +25,9 @@
         android:title="@string/feedback"
         app:showAsAction="never" />
 
+    <item
+        android:id="@+id/open_in_browser_item"
+        android:title="@string/open_external"
+        app:showAsAction="never" />
+
 </menu>
