@@ -5,12 +5,13 @@ import android.app.Application;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 
+import com.example.greenstream.activities.MainActivity;
 import com.example.greenstream.data.InformationItem;
 
 import java.util.List;
 
 /**
- * View model for the {@link com.example.greenstream.activities.FeedActivity FeedActivity}.
+ * View model for the {@link MainActivity FeedActivity}.
  */
 public class FeedViewModel extends AppViewModel {
 

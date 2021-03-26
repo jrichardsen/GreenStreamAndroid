@@ -46,6 +46,8 @@
     <string name="credentials">Account</string>
 
     <!-- Main activity -->
+    <string name="nav_open">Open</string>
+    <string name="nav_close">Close</string>
     <string name="like">Favoriten</string>
     <string name="watch_later">Später ansehen</string>
     <string name="history">Verlauf</string>
