@@ -3,9 +3,12 @@ package com.example.greenstream.data;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Language implements Parcelable {
 
     public static final Creator<Language> CREATOR = new Creator<Language>() {
@@ -19,32 +22,15 @@ public class Language implements Parcelable {
             return new Language[size];
         }
     };
-    private long id;
+
     private String name;
     private String value;
 
-    public Language() {
-
-    }
+    public Language() {}
 
     protected Language(Parcel in) {
         name = in.readString();
         value = in.readString();
-    }
-
-    public static Language createFromJson(JSONObject jsonObject) throws JSONException {
-        Language language = new Language();
-        language.name = jsonObject.getString("name");
-        language.value = jsonObject.getString("value");
-        return language;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
     }
 
     public String getName() {

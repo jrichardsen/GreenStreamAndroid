@@ -3,19 +3,30 @@ package com.example.greenstream.data;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.example.greenstream.network.EmbeddedJsonDeserializer;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
 /**
  * Data class for an information item.
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class InformationItem implements Parcelable {
 
     private long id;
     private String url;
     private String title;
     private String description;
+    @JsonDeserialize(using = EmbeddedJsonDeserializer.class, as = Language.class)
     private Language language;
+    @JsonDeserialize(using = EmbeddedJsonDeserializer.class, as = Topic.class)
     private Topic topic;
+    @JsonDeserialize(using = EmbeddedJsonDeserializer.class, as = Type.class)
     private Type type;
-    private int explanation;
+    @JsonProperty("explanation_id")
+    private long explanation;
 
     public static final Creator<InformationItem> CREATOR = new Creator<InformationItem>() {
         @Override
@@ -29,6 +40,8 @@ public class InformationItem implements Parcelable {
         }
     };
 
+    public InformationItem() {}
+
     protected InformationItem(Parcel in) {
         id = in.readLong();
         url = in.readString();
@@ -37,7 +50,7 @@ public class InformationItem implements Parcelable {
         language = in.readParcelable(Language.class.getClassLoader());
         topic = in.readParcelable(Topic.class.getClassLoader());
         type = in.readParcelable(Type.class.getClassLoader());
-        explanation = in.readInt();
+        explanation = in.readLong();
     }
 
     public InformationItem(long id, String url, String title, String description, String language, String topic, String type) {
@@ -67,7 +80,7 @@ public class InformationItem implements Parcelable {
         parcel.writeParcelable(language, i);
         parcel.writeParcelable(topic, i);
         parcel.writeParcelable(type, i);
-        parcel.writeInt(explanation);
+        parcel.writeLong(explanation);
     }
 
     public long getId() {
@@ -126,11 +139,11 @@ public class InformationItem implements Parcelable {
         this.type = type;
     }
 
-    public int getExplanation() {
+    public long getExplanation() {
         return explanation;
     }
 
-    public void setExplanation(int explanation) {
+    public void setExplanation(long explanation) {
         this.explanation = explanation;
     }
 }

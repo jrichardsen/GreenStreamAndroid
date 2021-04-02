@@ -10,10 +10,13 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.example.greenstream.activities.ViewActivity;
 import com.example.greenstream.alarm.AppAlarmManager;
+import com.example.greenstream.data.ExtendedInformationItem;
 import com.example.greenstream.data.InformationItem;
+import com.example.greenstream.network.AppNetworkManager;
 import com.example.greenstream.notifications.AppNotificationManager;
 import com.example.greenstream.preferences.AppPreferenceManager;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -30,6 +33,9 @@ public class Repository {
     private final AppPreferenceManager preferenceManager;
     private final AppAlarmManager alarmManager;
     private final AppNotificationManager notificationManager;
+    private final AppNetworkManager networkManager;
+
+    private final MutableLiveData<List<InformationItem>> recommendations;
 
     private Repository(Application application) {
         Log.d(TAG, "Initializing Repository");
@@ -37,7 +43,10 @@ public class Repository {
         alarmManager = new AppAlarmManager();
         notificationManager = new AppNotificationManager(context);
         preferenceManager = new AppPreferenceManager(context, this::updateAlarm);
+        networkManager = new AppNetworkManager(context);
         updateAlarm();
+
+        recommendations = new MutableLiveData<>(new ArrayList<>());
     }
 
     /**
@@ -57,157 +66,8 @@ public class Repository {
     }
 
     public LiveData<List<InformationItem>> getRecommendations() {
-        return sampleInformation();
-    }
-
-    //TODO: only for testing, remove later
-    private LiveData<List<InformationItem>> sampleInformation() {
-        return new MutableLiveData<>(Arrays.asList(
-                new InformationItem(
-                        135,
-                        "https://www.quarks.de/gesundheit/ernaehrung/alles-bio-warum-unsere-fleischwahl-nur-wenig-beeinflusst/",
-                        "Bio-Fleisch",
-                        "Ist Bio-Fleisch wirklich besser? - Quarks",
-                        "de",
-                        "Lebensmittel",
-                        "Artikel"
-                ),
-                new InformationItem(
-                        135,
-                        "https://www.quarks.de/gesundheit/ernaehrung/alles-bio-warum-unsere-fleischwahl-nur-wenig-beeinflusst/",
-                        "Bio-Fleisch",
-                        "Ist Bio-Fleisch wirklich besser? - Quarks",
-                        "de",
-                        "Lebensmittel",
-                        "Artikel"
-                ),
-                new InformationItem(
-                        135,
-                        "https://www.quarks.de/gesundheit/ernaehrung/alles-bio-warum-unsere-fleischwahl-nur-wenig-beeinflusst/",
-                        "Bio-Fleisch",
-                        "Ist Bio-Fleisch wirklich besser? - Quarks",
-                        "de",
-                        "Lebensmittel",
-                        "Artikel"
-                ),
-                new InformationItem(
-                        135,
-                        "https://www.quarks.de/gesundheit/ernaehrung/alles-bio-warum-unsere-fleischwahl-nur-wenig-beeinflusst/",
-                        "Bio-Fleisch",
-                        "Ist Bio-Fleisch wirklich besser? - Quarks",
-                        "de",
-                        "Lebensmittel",
-                        "Artikel"
-                ),
-                new InformationItem(
-                        135,
-                        "https://www.quarks.de/gesundheit/ernaehrung/alles-bio-warum-unsere-fleischwahl-nur-wenig-beeinflusst/",
-                        "Bio-Fleisch",
-                        "Ist Bio-Fleisch wirklich besser? - Quarks",
-                        "de",
-                        "Lebensmittel",
-                        "Artikel"
-                ),
-                new InformationItem(
-                        135,
-                        "https://www.quarks.de/gesundheit/ernaehrung/alles-bio-warum-unsere-fleischwahl-nur-wenig-beeinflusst/",
-                        "Bio-Fleisch",
-                        "Ist Bio-Fleisch wirklich besser? - Quarks",
-                        "de",
-                        "Lebensmittel",
-                        "Artikel"
-                ),
-                new InformationItem(
-                        135,
-                        "https://www.quarks.de/gesundheit/ernaehrung/alles-bio-warum-unsere-fleischwahl-nur-wenig-beeinflusst/",
-                        "Bio-Fleisch",
-                        "Ist Bio-Fleisch wirklich besser? - Quarks",
-                        "de",
-                        "Lebensmittel",
-                        "Artikel"
-                ),
-                new InformationItem(
-                        135,
-                        "https://www.quarks.de/gesundheit/ernaehrung/alles-bio-warum-unsere-fleischwahl-nur-wenig-beeinflusst/",
-                        "Bio-Fleisch",
-                        "Ist Bio-Fleisch wirklich besser? - Quarks",
-                        "de",
-                        "Lebensmittel",
-                        "Artikel"
-                ),
-                new InformationItem(
-                        135,
-                        "https://www.quarks.de/gesundheit/ernaehrung/alles-bio-warum-unsere-fleischwahl-nur-wenig-beeinflusst/",
-                        "Bio-Fleisch",
-                        "Ist Bio-Fleisch wirklich besser? - Quarks",
-                        "de",
-                        "Lebensmittel",
-                        "Artikel"
-                ),
-                new InformationItem(
-                        135,
-                        "https://www.quarks.de/gesundheit/ernaehrung/alles-bio-warum-unsere-fleischwahl-nur-wenig-beeinflusst/",
-                        "Bio-Fleisch",
-                        "Ist Bio-Fleisch wirklich besser? - Quarks",
-                        "de",
-                        "Lebensmittel",
-                        "Artikel"
-                ),
-                new InformationItem(
-                        135,
-                        "https://www.quarks.de/gesundheit/ernaehrung/alles-bio-warum-unsere-fleischwahl-nur-wenig-beeinflusst/",
-                        "Bio-Fleisch",
-                        "Ist Bio-Fleisch wirklich besser? - Quarks",
-                        "de",
-                        "Lebensmittel",
-                        "Artikel"
-                ),
-                new InformationItem(
-                        135,
-                        "https://www.quarks.de/gesundheit/ernaehrung/alles-bio-warum-unsere-fleischwahl-nur-wenig-beeinflusst/",
-                        "Bio-Fleisch",
-                        "Ist Bio-Fleisch wirklich besser? - Quarks",
-                        "de",
-                        "Lebensmittel",
-                        "Artikel"
-                ),
-                new InformationItem(
-                        135,
-                        "https://www.quarks.de/gesundheit/ernaehrung/alles-bio-warum-unsere-fleischwahl-nur-wenig-beeinflusst/",
-                        "Bio-Fleisch",
-                        "Ist Bio-Fleisch wirklich besser? - Quarks",
-                        "de",
-                        "Lebensmittel",
-                        "Artikel"
-                ),
-                new InformationItem(
-                        135,
-                        "https://www.quarks.de/gesundheit/ernaehrung/alles-bio-warum-unsere-fleischwahl-nur-wenig-beeinflusst/",
-                        "Bio-Fleisch",
-                        "Ist Bio-Fleisch wirklich besser? - Quarks",
-                        "de",
-                        "Lebensmittel",
-                        "Artikel"
-                ),
-                new InformationItem(
-                        135,
-                        "https://www.quarks.de/gesundheit/ernaehrung/alles-bio-warum-unsere-fleischwahl-nur-wenig-beeinflusst/",
-                        "Bio-Fleisch",
-                        "Ist Bio-Fleisch wirklich besser? - Quarks",
-                        "de",
-                        "Lebensmittel",
-                        "Artikel"
-                ),
-                new InformationItem(
-                        135,
-                        "https://www.quarks.de/gesundheit/ernaehrung/alles-bio-warum-unsere-fleischwahl-nur-wenig-beeinflusst/",
-                        "Bio-Fleisch",
-                        "Ist Bio-Fleisch wirklich besser? - Quarks",
-                        "de",
-                        "Lebensmittel",
-                        "Artikel"
-                )
-        ));
+        networkManager.requestAllItems(recommendations);
+        return recommendations;
     }
 
     public void updateAlarm() {

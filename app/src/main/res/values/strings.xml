@@ -20,6 +20,7 @@
 
     <!-- Links -->
     <string name="server_url">https://appsterdb.ackermann.digital/</string>
+    <string name="all_items_endpoint">api/items/10/</string>
     <string name="app_data_endpoint">api/full/</string>
     <string name="feedback_endpoint">api/feedback/</string>
     <string name="login_endpoint">login/</string>

@@ -3,14 +3,19 @@ package com.example.greenstream.data;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Type implements Parcelable {
 
     private long id;
     private String name;
+    @JsonProperty("view_external")
     private boolean viewExternal;
 
     public static final Creator<Type> CREATOR = new Creator<Type>() {
@@ -33,16 +38,6 @@ public class Type implements Parcelable {
 
     public Type() {
 
-    }
-
-    @NotNull
-    public static Type createFromJson(@NotNull JSONObject object)
-            throws JSONException {
-        Type type = new Type();
-        type.id = object.getLong("id");
-        type.name = object.getString("name");
-        type.viewExternal = object.getInt("view_external") != 0;
-        return type;
     }
 
     public long getId() {

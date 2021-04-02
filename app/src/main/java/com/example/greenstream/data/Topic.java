@@ -3,10 +3,13 @@ package com.example.greenstream.data;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Topic implements Parcelable {
 
     private long id;

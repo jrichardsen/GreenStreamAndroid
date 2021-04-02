@@ -83,7 +83,7 @@ public class AppNotificationManager {
                 .setAutoCancel(true)
                 .setContentTitle(informationItem.getTitle())
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(
-                        informationItem.getDescription() + " (" + informationItem.getType() + ")"))
+                        informationItem.getDescription() + " (" + informationItem.getType().getName() + ")"))
                 .setContentIntent(pendingShowIntent)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .addAction(R.drawable.ic_watch_later_24dp,
