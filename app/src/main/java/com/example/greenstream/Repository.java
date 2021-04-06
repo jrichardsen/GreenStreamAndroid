@@ -10,14 +10,13 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.example.greenstream.activities.ViewActivity;
 import com.example.greenstream.alarm.AppAlarmManager;
-import com.example.greenstream.data.ExtendedInformationItem;
+import com.example.greenstream.data.FeedState;
 import com.example.greenstream.data.InformationItem;
 import com.example.greenstream.network.AppNetworkManager;
 import com.example.greenstream.notifications.AppNotificationManager;
 import com.example.greenstream.preferences.AppPreferenceManager;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -29,13 +28,16 @@ public class Repository {
 
     private static volatile Repository INSTANCE;
 
+    private static final int FEED_BATCH_SIZE = 10;
+
     private final Application context;
     private final AppPreferenceManager preferenceManager;
     private final AppAlarmManager alarmManager;
     private final AppNotificationManager notificationManager;
     private final AppNetworkManager networkManager;
 
-    private final MutableLiveData<List<InformationItem>> recommendations;
+    private final MutableLiveData<List<InformationItem>> feed;
+    private final MutableLiveData<FeedState> feedState;
 
     private Repository(Application application) {
         Log.d(TAG, "Initializing Repository");
@@ -46,7 +48,8 @@ public class Repository {
         networkManager = new AppNetworkManager(context);
         updateAlarm();
 
-        recommendations = new MutableLiveData<>(new ArrayList<>());
+        feed = new MutableLiveData<>(new ArrayList<>());
+        feedState = new MutableLiveData<>(FeedState.LOADED);
     }
 
     /**
@@ -65,9 +68,27 @@ public class Repository {
         return INSTANCE;
     }
 
-    public LiveData<List<InformationItem>> getRecommendations() {
-        networkManager.requestAllItems(recommendations);
-        return recommendations;
+    public LiveData<List<InformationItem>> getFeed() {
+        return feed;
+    }
+
+    public LiveData<FeedState> getFeedState() {
+        return feedState;
+    }
+
+    public void updateFeed() {
+        if (feedState.getValue() != FeedState.LOADED)
+            return;
+        long startIndex = 0;
+        List<InformationItem> feedData = feed.getValue();
+        if (feedData != null && feedData.size() > 0)
+            startIndex = feedData.get(feedData.size() - 1).getId();
+        networkManager.requestFeed(feed, feedState, FEED_BATCH_SIZE, startIndex);
+    }
+
+    public void resetFeed() {
+        networkManager.cancelFeedRequests();
+        networkManager.requestFeed(feed, feedState, FEED_BATCH_SIZE, 0);
     }
 
     public void updateAlarm() {

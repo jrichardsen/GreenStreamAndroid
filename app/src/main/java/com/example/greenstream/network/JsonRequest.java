@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData;
 import com.android.volley.NetworkError;
 import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
+import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -25,7 +26,7 @@ import java.util.List;
  * @param <T> The type of the received object.
  *           Should be JSON parsable by a standard {@link ObjectMapper}.
  */
-public class JsonRequest<T> extends LiveDataRequest<T> {
+public class JsonRequest<T> extends Request<T> {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
     /**
@@ -33,14 +34,17 @@ public class JsonRequest<T> extends LiveDataRequest<T> {
      * otherwise unexpected behaviour might occur.
      */
     private final JavaType type;
+    @Nullable
+    private final ResponseListener<T> listener;
 
     public JsonRequest(int method,
                        @NotNull String url,
-                       @NotNull MutableLiveData<T> responseTarget,
                        @NotNull JavaType type,
-                       @Nullable Response.ErrorListener listener) {
-        super(method, url, responseTarget, listener);
+                       @Nullable ResponseListener<T> listener,
+                       @Nullable Response.ErrorListener errorListener) {
+        super(method, url, errorListener);
         this.type = type;
+        this.listener = listener;
     }
 
     @Override
@@ -57,12 +61,22 @@ public class JsonRequest<T> extends LiveDataRequest<T> {
             return Response.error(new NetworkError(response));
     }
 
+    @Override
+    protected void deliverResponse(T response) {
+        if (listener != null)
+            listener.onResponseSuccess(response);
+    }
+
     public static JavaType getTypeFromClass(Class<?> clazz) {
         return MAPPER.constructType(clazz);
     }
 
     public static JavaType getListTypeFromClass(Class<?> clazz) {
         return MAPPER.getTypeFactory().constructCollectionType(List.class, clazz);
+    }
+
+    public interface ResponseListener<T> {
+        void onResponseSuccess(T response);
     }
 
 }

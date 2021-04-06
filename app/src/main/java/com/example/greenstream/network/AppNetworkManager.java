@@ -10,6 +10,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.toolbox.Volley;
 import com.example.greenstream.R;
+import com.example.greenstream.data.FeedState;
 import com.example.greenstream.data.InformationItem;
 
 import org.jetbrains.annotations.NotNull;
@@ -38,6 +39,8 @@ public class AppNetworkManager {
     private static final Response.ErrorListener errorListener =
             error -> Log.e(TAG, "Error with Network Request", error);
 
+    private static final String FEED_REQUEST_TAG = "FEED_REQUEST";
+
     private final RequestQueue requestQueue;
     private final String allItemsEndpoint;
     private final String serverUrl;
@@ -50,19 +53,53 @@ public class AppNetworkManager {
     }
 
     /**
-     * Requests a number of items from the server
-     * @param resultTarget The live data for the result of the request
+     * Requests a number of items from the server.
+     * These items will extend or replace the list of currently loaded items in the given feed.
+     *
+     * @param feed       The live data for the result of the request
+     * @param feedState  Updates the feed state when beginning and ending loading, will not check
+     *                   the feedback state based on loading items
+     * @param amount     The amount of items to load
+     * @param startIndex The index of the last loaded item. If this is zero, a new feed will
+     *                   be requested and overwrite any previous data.
      */
-    public void requestAllItems(MutableLiveData<List<InformationItem>> resultTarget) {
-        String url = serverUrl + allItemsEndpoint;
+    public void requestFeed(MutableLiveData<List<InformationItem>> feed,
+                            MutableLiveData<FeedState> feedState,
+                            int amount,
+                            long startIndex) {
+        // Request another extra item
+        int requestAmount = amount + 1;
+        String url = serverUrl + allItemsEndpoint + "/" + requestAmount;
+        if (startIndex != 0)
+            url += "/" + startIndex;
         Log.d(TAG, "Sending network request to: " + url);
-        JsonRequest<List<InformationItem>> request = new JsonRequest<>(
+        Request<?> request = new JsonRequest<List<InformationItem>>(
                 Request.Method.GET,
                 url,
-                resultTarget,
                 JsonRequest.getListTypeFromClass(InformationItem.class),
-                errorListener);
+                (response) -> {
+                    if (response.size() == requestAmount) {
+                        // An extra item was retrieved, therefore there are more items available
+                        response.remove(response.size() - 1);
+                        feedState.setValue(FeedState.LOADED);
+                    } else {
+                        // All remaining items have been loaded
+                        feedState.setValue(FeedState.COMPLETED);
+                    }
+                    List<InformationItem> data = feed.getValue();
+                    if (startIndex == 0 || data == null)
+                        data = response;
+                    else
+                        data.addAll(response);
+                    feed.setValue(data);
+                },
+                errorListener).setTag(FEED_REQUEST_TAG);
+        feedState.setValue(FeedState.LOADING);
         requestQueue.add(request);
+    }
+
+    public void cancelFeedRequests() {
+        requestQueue.cancelAll(FEED_REQUEST_TAG);
     }
 
     /**

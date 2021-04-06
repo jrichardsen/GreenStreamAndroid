@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 
 import com.example.greenstream.activities.MainActivity;
+import com.example.greenstream.data.FeedState;
 import com.example.greenstream.data.InformationItem;
 
 import java.util.List;
@@ -13,14 +14,26 @@ import java.util.List;
 /**
  * View model for the {@link MainActivity FeedActivity}.
  */
-public class FeedViewModel extends AppViewModel {
+public class MainViewModel extends AppViewModel {
 
-    public FeedViewModel(@NonNull Application application) {
+    public MainViewModel(@NonNull Application application) {
         super(application);
     }
 
-    public LiveData<List<InformationItem>> getRecommendations() {
-        return repository.getRecommendations();
+    public LiveData<List<InformationItem>> getFeed() {
+        return repository.getFeed();
+    }
+
+    public LiveData<FeedState> getFeedState() {
+        return repository.getFeedState();
+    }
+
+    public void updateFeed() {
+        repository.updateFeed();
+    }
+
+    public void resetFeed() {
+        repository.resetFeed();
     }
 
     public void showInformation(InformationItem informationItem) {
