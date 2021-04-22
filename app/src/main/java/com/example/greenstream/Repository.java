@@ -90,11 +90,11 @@ public class Repository {
     public void updateFeed() {
         if (feedState.getValue() != FeedState.LOADED)
             return;
-        long startIndex = 0;
+        long loadedItems = 0;
         List<InformationItem> feedData = feed.getValue();
-        if (feedData != null && feedData.size() > 0)
-            startIndex = feedData.get(feedData.size() - 1).getId();
-        networkManager.requestFeed(feed, feedState, FEED_BATCH_SIZE, startIndex);
+        if (feedData != null)
+            loadedItems = feedData.size();
+        networkManager.requestFeed(feed, feedState, FEED_BATCH_SIZE, loadedItems);
     }
 
     public void resetFeed() {

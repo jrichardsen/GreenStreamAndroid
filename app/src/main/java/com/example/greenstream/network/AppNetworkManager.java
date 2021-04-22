@@ -62,22 +62,22 @@ public class AppNetworkManager implements AuthenticationServerInterface {
      * Requests a number of items from the server.
      * These items will extend or replace the list of currently loaded items in the given feed.
      *
-     * @param feed       The live data for the result of the request
-     * @param feedState  Updates the feed state when beginning and ending loading, will not check
-     *                   the feedback state based on loading items
-     * @param amount     The amount of items to load
-     * @param startIndex The index of the last loaded item. If this is zero, a new feed will
-     *                   be requested and overwrite any previous data.
+     * @param feed        The live data for the result of the request
+     * @param feedState   Updates the feed state when beginning and ending loading, will not check
+     *                    the feedback state based on loading items
+     * @param amount      The amount of items to load
+     * @param loadedItems The amount of already loaded items. If this is zero, a new feed will
+     *                    be requested and overwrite any previous data.
      */
     public void requestFeed(MutableLiveData<List<InformationItem>> feed,
                             MutableLiveData<FeedState> feedState,
                             int amount,
-                            long startIndex) {
+                            long loadedItems) {
         // Request another extra item
         int requestAmount = amount + 1;
         String url = serverUrl + allItemsEndpoint + "/" + requestAmount;
-        if (startIndex != 0)
-            url += "/" + startIndex;
+        if (loadedItems != 0)
+            url += "/" + loadedItems;
         Log.d(TAG, "Sending network request to: " + url);
         Request<?> request = new JsonRequest<List<InformationItem>>(
                 Request.Method.GET,
@@ -93,7 +93,7 @@ public class AppNetworkManager implements AuthenticationServerInterface {
                         feedState.setValue(FeedState.COMPLETED);
                     }
                     List<InformationItem> data = feed.getValue();
-                    if (startIndex == 0 || data == null)
+                    if (loadedItems == 0 || data == null)
                         data = response;
                     else
                         data.addAll(response);
