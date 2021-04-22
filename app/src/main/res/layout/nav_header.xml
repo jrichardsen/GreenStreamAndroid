@@ -4,11 +4,10 @@
     android:id="@+id/nav_header"
     android:layout_width="match_parent"
     android:layout_height="120dp"
-    android:background="@color/colorAccent"
+    android:background="@drawable/account_background"
     android:gravity="bottom"
     android:orientation="vertical"
-    android:padding="16dp"
-    android:theme="@style/ThemeOverlay.AppCompat.Dark">
+    android:padding="16dp">
 
     <TextView
         android:id="@+id/login_name"
