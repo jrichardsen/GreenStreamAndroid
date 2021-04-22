@@ -73,11 +73,20 @@
     <string name="email">Email</string>
     <string name="password">Passwort</string>
     <string name="login_failed">Anmeldung fehlgeschlagen!</string>
-    <string name="login">Login</string>
+    <string name="login">Einloggen</string>
     <string name="log_out_question">Willst du dich wirklich ausloggen?</string>
     <string name="login_to_synchronize">Login to synchronize</string>
     <string name="log_out">Log Out</string>
     <string name="logged_out_warning">You are not logged in. Your preferences and viewing history will not be synchronized with the server!</string>
     <string name="logged_in_status">You are logged in as user \"%1$s\". Your preferences and viewing history will be synchronized with the server!</string>
+    <string name="register">Registrieren</string>
+    <string name="title_activity_authenticator">AuthenticatorActivity</string>
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="welcome">"Welcome !"</string>
+    <string name="invalid_username">Not a valid username</string>
+    <string name="invalid_password">Password must be >5 characters</string>
 
 </resources>

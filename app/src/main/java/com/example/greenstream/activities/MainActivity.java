@@ -15,9 +15,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 
 import com.example.greenstream.R;
 import com.example.greenstream.adapters.InformationAdapter;
+import com.example.greenstream.authentication.AppAccount;
 import com.example.greenstream.data.FeedState;
 import com.example.greenstream.data.InformationItem;
 import com.example.greenstream.dialog.AppDialogBuilder;
@@ -54,6 +57,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         NavigationView navigationView = findViewById(R.id.navigation);
         navigationView.setNavigationItemSelectedListener(this);
 
+        viewModel.login(this, true);
+        viewModel.getAccount().observe(this, this::onAccountUpdate);
+
         RecyclerView informationListView = findViewById(R.id.information_list);
         informationListView.setLayoutManager(new LinearLayoutManager(this));
         InformationAdapter adapter = new InformationAdapter(createItemActionListener(), viewModel::updateFeed);
@@ -79,6 +85,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Log.d(TAG, "Activity created");
     }
 
+    private void onAccountUpdate(AppAccount account) {
+        NavigationView navigationView = findViewById(R.id.navigation);
+        View accountView = navigationView.getHeaderView(0);
+        TextView loginName = findViewById(R.id.login_name);
+        TextView loginEmail = findViewById(R.id.login_email);
+        boolean hasAccount = (account != null);
+        accountView.setVisibility(hasAccount ? View.VISIBLE : View.GONE);
+        navigationView.getMenu().setGroupVisible(R.id.nav_group_login, !hasAccount);
+        navigationView.getMenu().setGroupVisible(R.id.nav_group_view, hasAccount);
+        if (hasAccount) {
+            loginName.setText(account.getUsername());
+            loginEmail.setText(account.getEmail());
+        }
+    }
+
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (actionBarDrawerToggle.onOptionsItemSelected(item))
@@ -92,6 +113,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (id == R.id.settings_nav_item) {
             openSettings();
             return true;
+        }
+        if (id == R.id.login_nav_item) {
+            viewModel.login(this, false);
         }
         return false;
     }

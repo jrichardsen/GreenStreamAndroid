@@ -1,5 +1,6 @@
 package com.example.greenstream.network;
 
+import android.accounts.Account;
 import android.content.Context;
 import android.util.Log;
 
@@ -10,6 +11,9 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.toolbox.Volley;
 import com.example.greenstream.R;
+import com.example.greenstream.authentication.AppAccount;
+import com.example.greenstream.authentication.AuthenticationRequest;
+import com.example.greenstream.authentication.AuthenticationServerInterface;
 import com.example.greenstream.data.FeedState;
 import com.example.greenstream.data.InformationItem;
 
@@ -33,7 +37,7 @@ import javax.net.ssl.TrustManagerFactory;
 /**
  * Class to manage network traffic.
  */
-public class AppNetworkManager {
+public class AppNetworkManager implements AuthenticationServerInterface {
 
     private static final String TAG = "AppNetworkManager";
     private static final Response.ErrorListener errorListener =
@@ -42,14 +46,16 @@ public class AppNetworkManager {
     private static final String FEED_REQUEST_TAG = "FEED_REQUEST";
 
     private final RequestQueue requestQueue;
-    private final String allItemsEndpoint;
     private final String serverUrl;
+    private final String allItemsEndpoint;
+    private final String loginEndpoint;
 
     public AppNetworkManager(@NotNull Context context) {
         allowMySSL(context);
         requestQueue = Volley.newRequestQueue(context.getApplicationContext());
         serverUrl = context.getString(R.string.server_url);
         allItemsEndpoint = context.getString(R.string.all_items_endpoint);
+        loginEndpoint = context.getString(R.string.login_endpoint);
     }
 
     /**
@@ -102,11 +108,29 @@ public class AppNetworkManager {
         requestQueue.cancelAll(FEED_REQUEST_TAG);
     }
 
+    @Override
+    public void login(Account account,
+                      String password,
+                      JsonRequest.ResponseListener<AppAccount> listener,
+                      Response.ErrorListener errorListener) {
+        String url = serverUrl + loginEndpoint;
+        if (errorListener == null)
+            errorListener = AppNetworkManager.errorListener;
+        AuthenticationRequest request = new AuthenticationRequest(
+                Request.Method.POST,
+                url,
+                account,
+                password,
+                listener,
+                errorListener);
+        requestQueue.add(request);
+    }
+
     /**
      * Allows https requests to the server by adding the server certificate
      * to the default SSL Socket of any https request that are being made.
      */
-    private static void allowMySSL(Context context) {
+    public static void allowMySSL(Context context) {
         try {
 
             CertificateFactory cf = CertificateFactory.getInstance("X.509");
@@ -145,5 +169,4 @@ public class AppNetworkManager {
             Log.e(TAG, "Allowing custom SSL failed with error", e);
         }
     }
-
 }

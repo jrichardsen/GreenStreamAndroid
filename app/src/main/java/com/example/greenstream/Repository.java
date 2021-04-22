@@ -1,5 +1,7 @@
 package com.example.greenstream;
 
+import android.accounts.Account;
+import android.app.Activity;
 import android.app.Application;
 import android.content.Intent;
 import android.net.Uri;
@@ -10,8 +12,11 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.example.greenstream.activities.ViewActivity;
 import com.example.greenstream.alarm.AppAlarmManager;
+import com.example.greenstream.authentication.AppAccount;
+import com.example.greenstream.authentication.AppAccountManager;
 import com.example.greenstream.data.FeedState;
 import com.example.greenstream.data.InformationItem;
+import com.example.greenstream.encryption.AppEncryptionManager;
 import com.example.greenstream.network.AppNetworkManager;
 import com.example.greenstream.notifications.AppNotificationManager;
 import com.example.greenstream.preferences.AppPreferenceManager;
@@ -35,9 +40,12 @@ public class Repository {
     private final AppAlarmManager alarmManager;
     private final AppNotificationManager notificationManager;
     private final AppNetworkManager networkManager;
+    private final AppAccountManager accountManager;
+    private final AppEncryptionManager encryptionManager;
 
     private final MutableLiveData<List<InformationItem>> feed;
     private final MutableLiveData<FeedState> feedState;
+    private final MutableLiveData<AppAccount> account;
 
     private Repository(Application application) {
         Log.d(TAG, "Initializing Repository");
@@ -46,10 +54,13 @@ public class Repository {
         notificationManager = new AppNotificationManager(context);
         preferenceManager = new AppPreferenceManager(context, this::updateAlarm);
         networkManager = new AppNetworkManager(context);
+        accountManager = new AppAccountManager(context);
+        encryptionManager = new AppEncryptionManager();
         updateAlarm();
 
         feed = new MutableLiveData<>(new ArrayList<>());
         feedState = new MutableLiveData<>(FeedState.LOADED);
+        account = new MutableLiveData<>(null);
     }
 
     /**
@@ -147,6 +158,32 @@ public class Repository {
         InformationItem informationItem;
         //TODO: get the information item for the given id
         //showInformation(informationItem);
+    }
+
+    public void login(Activity activity, boolean onlyIfAvailable) {
+        Account[] accounts = accountManager.getAccounts();
+        // TODO: handle case with multiple accounts
+        if (accounts.length == 0) {
+            if (!onlyIfAvailable)
+                accountManager.addNewAccount(activity, this::authenticateToAccount);
+            return;
+        }
+        authenticateToAccount(accounts[0]);
+    }
+
+    private void authenticateToAccount(Account account) {
+        String encryptedPassword = accountManager.getPasswordForAccount(account);
+        try {
+            String password = encryptionManager.decryptMsg(context, encryptedPassword);
+            // TODO: also update auth token in account manager
+            networkManager.login(account, password, this.account::setValue, null);
+        } catch (Exception e) {
+            Log.e(TAG, "Could not decrypt password", e);
+        }
+    }
+
+    public LiveData<AppAccount> getAccount() {
+        return account;
     }
 
     public interface FeedbackReceivedCallback {
