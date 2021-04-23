@@ -14,9 +14,9 @@
             android:icon="@drawable/ic_watch_later_24dp"
             android:title="@string/watch_later" />
         <item
-            android:id="@+id/like_nav_item"
+            android:id="@+id/liked_nav_item"
             android:icon="@drawable/ic_liked_on_24dp"
-            android:title="@string/like" />
+            android:title="@string/liked" />
         <item
             android:id="@+id/history_nav_item"
             android:icon="@drawable/ic_history_24dp"

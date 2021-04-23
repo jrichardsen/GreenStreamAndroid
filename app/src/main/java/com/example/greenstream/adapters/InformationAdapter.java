@@ -21,13 +21,13 @@ import java.util.List;
 /**
  * Adapter for displaying information items within a {@link RecyclerView}.
  */
-public class InformationAdapter
+public class InformationAdapter<T extends InformationItem>
         extends RecyclerView.Adapter<InformationAdapter.InformationViewHolder> {
 
     private static final int TYPE_ITEM = 0;
     private static final int TYPE_PROGRESS_BAR = 1;
 
-    private List<InformationItem> data = Collections.emptyList();
+    private List<T> data = Collections.emptyList();
     /**
      * The view holder for the view that was last clicked.
      * This view is the only one that might show their actions.
@@ -42,7 +42,7 @@ public class InformationAdapter
         this.loadingListener = loadingListener;
     }
 
-    public void setData(@NotNull List<InformationItem> data) {
+    public void setData(@NotNull List<T> data) {
         this.data = data;
         notifyDataSetChanged();
     }

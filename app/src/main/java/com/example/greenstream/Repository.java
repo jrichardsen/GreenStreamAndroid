@@ -14,14 +14,17 @@ import com.example.greenstream.activities.ViewActivity;
 import com.example.greenstream.alarm.AppAlarmManager;
 import com.example.greenstream.authentication.AppAccount;
 import com.example.greenstream.authentication.AppAccountManager;
-import com.example.greenstream.data.FeedState;
+import com.example.greenstream.data.ExtendedInformationItem;
+import com.example.greenstream.data.ListState;
 import com.example.greenstream.data.InformationItem;
+import com.example.greenstream.data.PersonalListType;
 import com.example.greenstream.encryption.AppEncryptionManager;
 import com.example.greenstream.network.AppNetworkManager;
 import com.example.greenstream.notifications.AppNotificationManager;
 import com.example.greenstream.preferences.AppPreferenceManager;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -33,7 +36,7 @@ public class Repository {
 
     private static volatile Repository INSTANCE;
 
-    private static final int FEED_BATCH_SIZE = 10;
+    private static final int REQUEST_BATCH_SIZE = 10;
 
     private final Application context;
     private final AppPreferenceManager preferenceManager;
@@ -44,7 +47,10 @@ public class Repository {
     private final AppEncryptionManager encryptionManager;
 
     private final MutableLiveData<List<InformationItem>> feed;
-    private final MutableLiveData<FeedState> feedState;
+    private final MutableLiveData<ListState> feedState;
+    private final MutableLiveData<List<ExtendedInformationItem>> personalList;
+    private final MutableLiveData<ListState> personalListState;
+    private PersonalListType personalListType;
     private final MutableLiveData<AppAccount> account;
 
     private Repository(Application application) {
@@ -59,8 +65,11 @@ public class Repository {
         updateAlarm();
 
         feed = new MutableLiveData<>(new ArrayList<>());
-        feedState = new MutableLiveData<>(FeedState.LOADED);
+        feedState = new MutableLiveData<>(ListState.LOADED);
         account = new MutableLiveData<>(null);
+        personalList = new MutableLiveData<>(new ArrayList<>());
+        personalListState = new MutableLiveData<>(ListState.LOADED);
+        personalListType = null;
     }
 
     /**
@@ -83,23 +92,71 @@ public class Repository {
         return feed;
     }
 
-    public LiveData<FeedState> getFeedState() {
+    public LiveData<ListState> getFeedState() {
         return feedState;
     }
 
     public void updateFeed() {
-        if (feedState.getValue() != FeedState.LOADED)
+        if (feedState.getValue() != ListState.LOADED)
             return;
         long loadedItems = 0;
         List<InformationItem> feedData = feed.getValue();
         if (feedData != null)
             loadedItems = feedData.size();
-        networkManager.requestFeed(feed, feedState, FEED_BATCH_SIZE, loadedItems);
+        String accessToken = tryGetAccessToken(false);
+        networkManager.requestFeed(feed, feedState, REQUEST_BATCH_SIZE, loadedItems, accessToken);
     }
 
     public void resetFeed() {
         networkManager.cancelFeedRequests();
-        networkManager.requestFeed(feed, feedState, FEED_BATCH_SIZE, 0);
+        feed.setValue(new ArrayList<>());
+        feedState.setValue(ListState.LOADED);
+    }
+
+    public LiveData<List<ExtendedInformationItem>> getPersonalList(PersonalListType type) {
+        if (personalListType != type) {
+            resetPersonalList();
+            personalListType = type;
+        }
+        return personalList;
+    }
+
+    public LiveData<ListState> getPersonalListState() {
+        return personalListState;
+    }
+
+    public void updatePersonalList(PersonalListType type) {
+        if (personalListState.getValue() != ListState.LOADED)
+            return;
+        long start = System.currentTimeMillis();
+        List<ExtendedInformationItem> listData = personalList.getValue();
+        if (listData != null && listData.size() > 0)
+            start = type.getPropertyOf(listData.get(listData.size() - 1));
+        String accessToken = tryGetAccessToken(true);
+        networkManager.requestPersonalItems(context,
+                type,
+                personalList,
+                personalListState,
+                REQUEST_BATCH_SIZE,
+                start,
+                accessToken);
+    }
+
+    public void resetPersonalList() {
+        if (personalListType != null)
+            networkManager.cancelPersonalListRequests(personalListType);
+        personalList.setValue(new ArrayList<>());
+        personalListState.setValue(ListState.LOADED);
+    }
+
+    private String tryGetAccessToken(boolean assertExisting) throws IllegalStateException {
+        AppAccount accountData = account.getValue();
+        if (accountData != null)
+            return accountData.getAccessToken();
+        else if (assertExisting)
+            throw new IllegalStateException("User is not logged in, " +
+                    "but an access token is needed for this operation");
+        return null;
     }
 
     public void updateAlarm() {

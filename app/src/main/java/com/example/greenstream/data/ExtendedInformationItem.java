@@ -2,30 +2,34 @@ package com.example.greenstream.data;
 
 import android.os.Parcel;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * Information item that additionally keeps track of item specific user data.
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ExtendedInformationItem extends InformationItem {
 
+    @JsonProperty("last_recommended")
     private long lastRecommended;
 
-    private boolean liked;
+    private long liked;
 
-    private boolean watched;
+    private long watched;
 
-    private boolean onWatchLaterList;
+    @JsonProperty("watchlist")
+    private long onWatchLaterList;
 
     protected ExtendedInformationItem(Parcel in) {
         super(in);
         lastRecommended = in.readLong();
-        liked = in.readByte() != 0;
-        watched = in.readByte() != 0;
-        onWatchLaterList = in.readByte() != 0;
+        liked = in.readLong();
+        watched = in.readLong();
+        onWatchLaterList = in.readLong();
     }
 
-    public ExtendedInformationItem(long id, String url, String title, String description, String language, String topic, String type) {
-        super(id, url, title, description, language, topic, type);
-    }
+    public ExtendedInformationItem() {}
 
     public long getLastRecommended() {
         return lastRecommended;
@@ -35,27 +39,27 @@ public class ExtendedInformationItem extends InformationItem {
         this.lastRecommended = lastRecommended;
     }
 
-    public boolean isLiked() {
+    public long getLiked() {
         return liked;
     }
 
-    public void setLiked(boolean liked) {
+    public void setLiked(long liked) {
         this.liked = liked;
     }
 
-    public boolean isWatched() {
+    public long getWatched() {
         return watched;
     }
 
-    public void setWatched(boolean watched) {
+    public void setWatched(long watched) {
         this.watched = watched;
     }
 
-    public boolean isOnWatchLaterList() {
+    public long getOnWatchLaterList() {
         return onWatchLaterList;
     }
 
-    public void setOnWatchLaterList(boolean onWatchLaterList) {
+    public void setOnWatchLaterList(long onWatchLaterList) {
         this.onWatchLaterList = onWatchLaterList;
     }
 
@@ -63,8 +67,8 @@ public class ExtendedInformationItem extends InformationItem {
     public void writeToParcel(Parcel parcel, int i) {
         super.writeToParcel(parcel, i);
         parcel.writeLong(lastRecommended);
-        parcel.writeByte((byte) (liked ? 1 : 0));
-        parcel.writeByte((byte) (watched ? 1 : 0));
-        parcel.writeByte((byte) (onWatchLaterList ? 1 : 0));
+        parcel.writeLong(liked);
+        parcel.writeLong(watched);
+        parcel.writeLong(onWatchLaterList);
     }
 }

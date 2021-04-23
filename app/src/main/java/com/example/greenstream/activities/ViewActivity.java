@@ -60,7 +60,7 @@ public class ViewActivity extends AppCompatActivity {
         String url = informationItem.getUrl();
         loggedIn = informationItem instanceof ExtendedInformationItem;
         if (loggedIn)
-            liked = ((ExtendedInformationItem) informationItem).isLiked();
+            liked = ((ExtendedInformationItem) informationItem).getLiked() != 0;
         urlText.setText(url);
         Log.d(TAG, "View activity loaded with url " + url);
         progressBar.setVisibility(View.VISIBLE);

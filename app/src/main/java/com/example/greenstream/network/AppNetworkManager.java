@@ -6,6 +6,7 @@ import android.util.Log;
 
 import androidx.lifecycle.MutableLiveData;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -14,8 +15,11 @@ import com.example.greenstream.R;
 import com.example.greenstream.authentication.AppAccount;
 import com.example.greenstream.authentication.AuthenticationRequest;
 import com.example.greenstream.authentication.AuthenticationServerInterface;
-import com.example.greenstream.data.FeedState;
+import com.example.greenstream.data.ExtendedInformationItem;
+import com.example.greenstream.data.ListState;
 import com.example.greenstream.data.InformationItem;
+import com.example.greenstream.data.PersonalListType;
+import com.fasterxml.jackson.databind.JavaType;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -28,7 +32,9 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -47,14 +53,15 @@ public class AppNetworkManager implements AuthenticationServerInterface {
 
     private final RequestQueue requestQueue;
     private final String serverUrl;
-    private final String allItemsEndpoint;
+    private final String feedEndpoint;
+
     private final String loginEndpoint;
 
     public AppNetworkManager(@NotNull Context context) {
         allowMySSL(context);
         requestQueue = Volley.newRequestQueue(context.getApplicationContext());
         serverUrl = context.getString(R.string.server_url);
-        allItemsEndpoint = context.getString(R.string.all_items_endpoint);
+        feedEndpoint = context.getString(R.string.all_items_endpoint);
         loginEndpoint = context.getString(R.string.login_endpoint);
     }
 
@@ -70,42 +77,83 @@ public class AppNetworkManager implements AuthenticationServerInterface {
      *                    be requested and overwrite any previous data.
      */
     public void requestFeed(MutableLiveData<List<InformationItem>> feed,
-                            MutableLiveData<FeedState> feedState,
+                            MutableLiveData<ListState> feedState,
                             int amount,
-                            long loadedItems) {
+                            long loadedItems,
+                            String accessToken) {
+        requestItems(feed, feedState, amount, loadedItems, accessToken, feedEndpoint, FEED_REQUEST_TAG);
+    }
+
+    public void requestPersonalItems(Context context,
+                                     PersonalListType type,
+                                     MutableLiveData<List<ExtendedInformationItem>> items,
+                                     MutableLiveData<ListState> listState,
+                                     int amount,
+                                     long start,
+                                     String accessToken) {
+        String endpoint = context.getString(type.getEndpoint());
+        String tag = type.getRequestTag();
+        requestItems(items, listState, amount, start, accessToken, endpoint, tag);
+    }
+
+    private <T extends InformationItem> void requestItems(MutableLiveData<List<T>> items,
+                                                          MutableLiveData<ListState> listState,
+                                                          int amount,
+                                                          long start,
+                                                          String accessToken,
+                                                          String endpoint,
+                                                          String tag) {
         // Request another extra item
         int requestAmount = amount + 1;
-        String url = serverUrl + allItemsEndpoint + "/" + requestAmount;
-        if (loadedItems != 0)
-            url += "/" + loadedItems;
+        String url = serverUrl + endpoint + "/" + requestAmount;
+        if (start != 0)
+            url += "/" + start;
         Log.d(TAG, "Sending network request to: " + url);
-        Request<?> request = new JsonRequest<List<InformationItem>>(
+        JavaType type;
+        if (accessToken != null)
+            type = JsonRequest.getListTypeFromClass(ExtendedInformationItem.class);
+        else
+            type = JsonRequest.getListTypeFromClass(InformationItem.class);
+        Request<?> request = new JsonRequest<List<T>>(
                 Request.Method.GET,
                 url,
-                JsonRequest.getListTypeFromClass(InformationItem.class),
+                type,
                 (response) -> {
                     if (response.size() == requestAmount) {
                         // An extra item was retrieved, therefore there are more items available
                         response.remove(response.size() - 1);
-                        feedState.setValue(FeedState.LOADED);
+                        listState.setValue(ListState.LOADED);
                     } else {
                         // All remaining items have been loaded
-                        feedState.setValue(FeedState.COMPLETED);
+                        listState.setValue(ListState.COMPLETED);
                     }
-                    List<InformationItem> data = feed.getValue();
-                    if (loadedItems == 0 || data == null)
+                    List<T> data = items.getValue();
+                    if (start == 0 || data == null)
                         data = response;
                     else
                         data.addAll(response);
-                    feed.setValue(data);
+                    items.setValue(data);
                 },
-                errorListener).setTag(FEED_REQUEST_TAG);
-        feedState.setValue(FeedState.LOADING);
+                errorListener) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>(super.getHeaders());
+                if (accessToken != null)
+                    params.put("Cookie", "jwt=" + accessToken);
+                return params;
+            }
+        }.setTag(tag);
+        listState.setValue(ListState.LOADING);
         requestQueue.add(request);
     }
 
     public void cancelFeedRequests() {
         requestQueue.cancelAll(FEED_REQUEST_TAG);
+    }
+
+    public void cancelPersonalListRequests(PersonalListType type) {
+        if (type != null)
+            requestQueue.cancelAll(type.getRequestTag());
     }
 
     @Override

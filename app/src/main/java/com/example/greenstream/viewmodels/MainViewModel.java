@@ -8,7 +8,7 @@ import androidx.lifecycle.LiveData;
 
 import com.example.greenstream.activities.MainActivity;
 import com.example.greenstream.authentication.AppAccount;
-import com.example.greenstream.data.FeedState;
+import com.example.greenstream.data.ListState;
 import com.example.greenstream.data.InformationItem;
 
 import java.util.List;
@@ -26,7 +26,7 @@ public class MainViewModel extends AppViewModel {
         return repository.getFeed();
     }
 
-    public LiveData<FeedState> getFeedState() {
+    public LiveData<ListState> getFeedState() {
         return repository.getFeedState();
     }
 

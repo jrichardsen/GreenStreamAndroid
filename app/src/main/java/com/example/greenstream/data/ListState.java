@@ -3,7 +3,7 @@ package com.example.greenstream.data;
 /**
  * Describes the state of the feed.
  */
-public enum FeedState {
+public enum ListState {
     /**
      * Feed is currently loading new data.
      */

@@ -11,7 +11,7 @@
     <item
         android:id="@+id/view_like_item"
         android:icon="@drawable/ic_liked_off_24dp"
-        android:title="@string/like"
+        android:title="@string/liked"
         app:showAsAction="always" />
 
     <item
