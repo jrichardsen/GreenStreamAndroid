@@ -40,6 +40,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private MainViewModel viewModel;
     private DrawerLayout drawer;
     private ActionBarDrawerToggle actionBarDrawerToggle;
+    private NavigationView navigationView;
+    private View accountView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,8 +56,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         ActionBar supportActionBar = getSupportActionBar();
         if (supportActionBar != null)
             supportActionBar.setDisplayHomeAsUpEnabled(true);
-        NavigationView navigationView = findViewById(R.id.navigation);
+        navigationView = findViewById(R.id.navigation);
         navigationView.setNavigationItemSelectedListener(this);
+        accountView = navigationView.getHeaderView(0);
+        accountView.setOnClickListener(this::onAccountViewClicked);
 
         viewModel.login(this, true);
         viewModel.getAccount().observe(this, this::onAccountUpdate);
@@ -82,8 +86,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void onAccountUpdate(AppAccount account) {
-        NavigationView navigationView = findViewById(R.id.navigation);
-        View accountView = navigationView.getHeaderView(0);
         TextView loginName = findViewById(R.id.login_name);
         TextView loginEmail = findViewById(R.id.login_email);
         boolean hasAccount = (account != null);
@@ -94,6 +96,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             loginName.setText(account.getUsername());
             loginEmail.setText(account.getEmail());
         }
+    }
+
+    private void onAccountViewClicked(View view) {
+        viewModel.logout();
     }
 
     @Override

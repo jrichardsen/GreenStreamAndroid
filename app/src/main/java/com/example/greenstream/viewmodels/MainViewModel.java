@@ -46,6 +46,10 @@ public class MainViewModel extends AppViewModel {
         repository.login(activity, onlyIfAvailable);
     }
 
+    public void logout() {
+        repository.logout();
+    }
+
     public LiveData<AppAccount> getAccount() {
         return repository.getAccount();
     }

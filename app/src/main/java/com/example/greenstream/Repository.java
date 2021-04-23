@@ -233,6 +233,10 @@ public class Repository {
         authenticateToAccount(accounts[0]);
     }
 
+    public void logout() {
+        account.setValue(null);
+    }
+
     private void authenticateToAccount(Account account) {
         String encryptedPassword = accountManager.getPasswordForAccount(account);
         try {
