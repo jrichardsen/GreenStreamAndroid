@@ -11,6 +11,8 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 
 import com.example.greenstream.R;
 import com.example.greenstream.adapters.InformationAdapter;
@@ -20,6 +22,9 @@ import com.example.greenstream.data.ListState;
 import com.example.greenstream.data.PersonalListType;
 import com.example.greenstream.dialog.AppDialogBuilder;
 import com.example.greenstream.viewmodels.ItemListViewModel;
+
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
 
 public class ItemListActivity extends AppCompatActivity {
 
@@ -55,11 +60,16 @@ public class ItemListActivity extends AppCompatActivity {
         // Reset feed when swiping down
         swipeRefreshLayout.setOnRefreshListener(viewModel::resetPersonalList);
 
-        // Update progress bars according to the state of the feed
+        // Update progress bars according to the state of the list
+        View errorMessage = findViewById(R.id.list_error_message);
+        Button retryButton = findViewById(R.id.retry_button);
+        retryButton.setOnClickListener(view -> viewModel.updatePersonalList(type));
         viewModel.getPersonalListState().observe(this, listState -> {
             adapter.setShowProgressBar(listState != ListState.COMPLETED);
             boolean refreshing = swipeRefreshLayout.isRefreshing();
             swipeRefreshLayout.setRefreshing(refreshing && listState == ListState.LOADING);
+            swipeRefreshLayout.setVisibility((listState != ListState.FAILED) ? VISIBLE : GONE);
+            errorMessage.setVisibility((listState == ListState.FAILED) ? VISIBLE : GONE);
         });
 
     }

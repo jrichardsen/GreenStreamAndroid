@@ -5,15 +5,29 @@ package com.example.greenstream.data;
  */
 public enum ListState {
     /**
-     * Feed is currently loading new data.
+     * List is currently loading new data.
      */
-    LOADING,
+    LOADING(true),
     /**
-     * Feed is not currently loading data, but a request for new data can be started.
+     * List is not currently loading data, but a request for new data can be started.
      */
-    LOADED,
+    READY(false),
     /**
-     * Feed is not currently loading data. All data has already been loaded.
+     * List is not currently loading data. All data has already been loaded.
      */
-    COMPLETED
+    COMPLETED(true),
+    /**
+     * Last try to load data failed for list. It can be tried to load data again.
+     */
+    FAILED(false);
+
+    private final boolean preventLoadingData;
+
+    ListState(boolean preventLoadingData) {
+        this.preventLoadingData = preventLoadingData;
+    }
+
+    public boolean preventLoadingData() {
+        return !preventLoadingData;
+    }
 }

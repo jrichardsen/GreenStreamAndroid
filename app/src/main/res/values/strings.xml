@@ -91,5 +91,7 @@
     <string name="welcome">"Welcome !"</string>
     <string name="invalid_username">Not a valid username</string>
     <string name="invalid_password">Password must be >5 characters</string>
+    <string name="loading_data_failed">Inhalte konnten nicht geladen werden!</string>
+    <string name="retry">Erneut versuchen</string>
 
 </resources>

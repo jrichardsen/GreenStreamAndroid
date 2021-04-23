@@ -16,6 +16,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.greenstream.R;
@@ -27,6 +28,9 @@ import com.example.greenstream.data.PersonalListType;
 import com.example.greenstream.dialog.AppDialogBuilder;
 import com.example.greenstream.viewmodels.MainViewModel;
 import com.google.android.material.navigation.NavigationView;
+
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
 
 /**
  * Class representing the activity that feeds content to the user.
@@ -76,10 +80,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         swipeRefreshLayout.setOnRefreshListener(viewModel::resetFeed);
 
         // Update progress bars according to the state of the feed
+        View errorMessage = findViewById(R.id.feed_error_message);
+        Button retryButton = findViewById(R.id.retry_button);
+        retryButton.setOnClickListener(view -> viewModel.updateFeed());
         viewModel.getFeedState().observe(this, listState -> {
             adapter.setShowProgressBar(listState != ListState.COMPLETED);
             boolean refreshing = swipeRefreshLayout.isRefreshing();
             swipeRefreshLayout.setRefreshing(refreshing && listState == ListState.LOADING);
+            swipeRefreshLayout.setVisibility((listState != ListState.FAILED) ? VISIBLE : GONE);
+            errorMessage.setVisibility((listState == ListState.FAILED) ? VISIBLE : GONE);
         });
 
         Log.d(TAG, "Activity created");
@@ -89,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         TextView loginName = findViewById(R.id.login_name);
         TextView loginEmail = findViewById(R.id.login_email);
         boolean hasAccount = (account != null);
-        accountView.setVisibility(hasAccount ? View.VISIBLE : View.GONE);
+        accountView.setVisibility(hasAccount ? VISIBLE : GONE);
         navigationView.getMenu().setGroupVisible(R.id.nav_group_login, !hasAccount);
         navigationView.getMenu().setGroupVisible(R.id.nav_group_view, hasAccount);
         if (hasAccount) {

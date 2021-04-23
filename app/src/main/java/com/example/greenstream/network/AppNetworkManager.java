@@ -122,7 +122,7 @@ public class AppNetworkManager implements AuthenticationServerInterface {
                     if (response.size() == requestAmount) {
                         // An extra item was retrieved, therefore there are more items available
                         response.remove(response.size() - 1);
-                        listState.setValue(ListState.LOADED);
+                        listState.setValue(ListState.READY);
                     } else {
                         // All remaining items have been loaded
                         listState.setValue(ListState.COMPLETED);
@@ -134,7 +134,10 @@ public class AppNetworkManager implements AuthenticationServerInterface {
                         data.addAll(response);
                     items.setValue(data);
                 },
-                errorListener) {
+                error -> {
+                    Log.e(TAG, "Error occurred while loading data", error);
+                    listState.setValue(ListState.FAILED);
+                }) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String, String> params = new HashMap<>(super.getHeaders());

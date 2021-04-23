@@ -24,7 +24,6 @@ import com.example.greenstream.notifications.AppNotificationManager;
 import com.example.greenstream.preferences.AppPreferenceManager;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -65,10 +64,10 @@ public class Repository {
         updateAlarm();
 
         feed = new MutableLiveData<>(new ArrayList<>());
-        feedState = new MutableLiveData<>(ListState.LOADED);
+        feedState = new MutableLiveData<>(ListState.READY);
         account = new MutableLiveData<>(null);
         personalList = new MutableLiveData<>(new ArrayList<>());
-        personalListState = new MutableLiveData<>(ListState.LOADED);
+        personalListState = new MutableLiveData<>(ListState.READY);
         personalListType = null;
 
         account.observeForever(appAccount -> {
@@ -102,7 +101,8 @@ public class Repository {
     }
 
     public void updateFeed() {
-        if (feedState.getValue() != ListState.LOADED)
+        ListState currentState = feedState.getValue();
+        if (currentState != null && currentState.preventLoadingData())
             return;
         long loadedItems = 0;
         List<InformationItem> feedData = feed.getValue();
@@ -115,7 +115,7 @@ public class Repository {
     public void resetFeed() {
         networkManager.cancelFeedRequests();
         feed.setValue(new ArrayList<>());
-        feedState.setValue(ListState.LOADED);
+        feedState.setValue(ListState.READY);
     }
 
     public LiveData<List<ExtendedInformationItem>> getPersonalList(PersonalListType type) {
@@ -131,7 +131,8 @@ public class Repository {
     }
 
     public void updatePersonalList(PersonalListType type) {
-        if (personalListState.getValue() != ListState.LOADED)
+        ListState currentState = personalListState.getValue();
+        if (currentState != null && currentState.preventLoadingData())
             return;
         long start = System.currentTimeMillis();
         List<ExtendedInformationItem> listData = personalList.getValue();
@@ -151,7 +152,7 @@ public class Repository {
         if (personalListType != null)
             networkManager.cancelPersonalListRequests(personalListType);
         personalList.setValue(new ArrayList<>());
-        personalListState.setValue(ListState.LOADED);
+        personalListState.setValue(ListState.READY);
     }
 
     private String tryGetAccessToken(boolean assertExisting) throws IllegalStateException {
