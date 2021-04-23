@@ -28,6 +28,6 @@ public enum ListState {
     }
 
     public boolean preventLoadingData() {
-        return !preventLoadingData;
+        return preventLoadingData;
     }
 }
