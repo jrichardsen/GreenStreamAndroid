@@ -70,6 +70,11 @@ public class Repository {
         personalList = new MutableLiveData<>(new ArrayList<>());
         personalListState = new MutableLiveData<>(ListState.LOADED);
         personalListType = null;
+
+        account.observeForever(appAccount -> {
+            resetFeed();
+            resetPersonalList();
+        });
     }
 
     /**
