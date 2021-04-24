@@ -19,11 +19,8 @@ public class InformationItem implements Parcelable {
     private String url;
     private String title;
     private String description;
-    @JsonDeserialize(using = EmbeddedJsonDeserializer.class, as = Language.class)
     private Language language;
-    @JsonDeserialize(using = EmbeddedJsonDeserializer.class, as = Topic.class)
     private Topic topic;
-    @JsonDeserialize(using = EmbeddedJsonDeserializer.class, as = Type.class)
     private Type type;
     @JsonProperty("explanation_id")
     private long explanation;
