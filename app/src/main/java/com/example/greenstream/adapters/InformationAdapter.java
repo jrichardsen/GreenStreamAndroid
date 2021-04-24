@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.greenstream.R;
 import com.example.greenstream.data.InformationItem;
+import com.example.greenstream.data.ListState;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -26,6 +27,7 @@ public class InformationAdapter<T extends InformationItem>
 
     private static final int TYPE_ITEM = 0;
     private static final int TYPE_PROGRESS_BAR = 1;
+    private static final int TYPE_ERROR_MESSAGE = 2;
 
     private List<T> data = Collections.emptyList();
     /**
@@ -33,7 +35,7 @@ public class InformationAdapter<T extends InformationItem>
      * This view is the only one that might show their actions.
      */
     private InformationViewHolder lastSelectedViewHolder = null;
-    private boolean showProgressBar = false;
+    private int footerType = 0;
     private final ItemActionListener listener;
     private final LoadingListener loadingListener;
 
@@ -50,7 +52,7 @@ public class InformationAdapter<T extends InformationItem>
     @Override
     public int getItemViewType(int position) {
         if (position == data.size())
-            return TYPE_PROGRESS_BAR;
+            return footerType;
         else return TYPE_ITEM;
     }
 
@@ -61,10 +63,13 @@ public class InformationAdapter<T extends InformationItem>
         if (viewType == TYPE_ITEM)
             view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.information_item, parent, false);
-        else
+        else if (viewType == TYPE_PROGRESS_BAR)
             view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.progress_bar, parent, false);
-        return new InformationViewHolder(view, viewType == TYPE_ITEM, this::onItemClicked);
+        else
+            view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.error_item, parent, false);
+        return new InformationViewHolder(view, viewType, this::onItemClicked);
     }
 
     @Override
@@ -75,12 +80,14 @@ public class InformationAdapter<T extends InformationItem>
         else if (viewType == TYPE_PROGRESS_BAR)
             // load new data as soon as the progress bar is bound to a view holder
             loadingListener.loadMoreData();
+        else if (viewType == TYPE_ERROR_MESSAGE)
+            holder.bindErrorItem(loadingListener);
     }
 
     @Override
     public int getItemCount() {
         // Get one extra item for showing the progress bar
-        return data.size() + (showProgressBar ? 1 : 0);
+        return data.size() + ((footerType != 0) ? 1 : 0);
     }
 
     /**
@@ -102,9 +109,14 @@ public class InformationAdapter<T extends InformationItem>
         }
     }
 
-    public void setShowProgressBar(boolean showProgressBar) {
-        if (this.showProgressBar != showProgressBar) {
-            this.showProgressBar = showProgressBar;
+    public void setListState(ListState listState) {
+        int footerType = 0;
+        if (listState == ListState.LOADING || listState == ListState.READY)
+            footerType = TYPE_PROGRESS_BAR;
+        else if (listState == ListState.FAILED)
+            footerType = TYPE_ERROR_MESSAGE;
+        if (this.footerType != footerType) {
+            this.footerType = footerType;
             notifyDataSetChanged();
         }
     }
@@ -137,9 +149,11 @@ public class InformationAdapter<T extends InformationItem>
         private Button showButton;
         private boolean actionsVisible;
 
-        InformationViewHolder(@NonNull View itemView, boolean hasItem, ItemListener listener) {
+        private Button retryButton;
+
+        InformationViewHolder(@NonNull View itemView, int viewType, ItemListener listener) {
             super(itemView);
-            if (hasItem) {
+            if (viewType == TYPE_ITEM) {
                 itemView.setOnClickListener(view -> listener.onItemClicked(this));
                 titleText = itemView.findViewById(R.id.title_text);
                 typeText = itemView.findViewById(R.id.type_text);
@@ -147,6 +161,8 @@ public class InformationAdapter<T extends InformationItem>
                 actionLayout = itemView.findViewById(R.id.information_action_layout);
                 feedbackButton = itemView.findViewById(R.id.feedback_button);
                 showButton = itemView.findViewById(R.id.show_button);
+            } else if(viewType == TYPE_ERROR_MESSAGE) {
+                retryButton = itemView.findViewById(R.id.retry_button);
             }
         }
 
@@ -157,6 +173,10 @@ public class InformationAdapter<T extends InformationItem>
             setActionsVisible(false);
             feedbackButton.setOnClickListener(view -> listener.onFeedbackAction(informationItem));
             showButton.setOnClickListener(view -> listener.onShowAction(informationItem));
+        }
+
+        private void bindErrorItem(LoadingListener loadingListener) {
+            retryButton.setOnClickListener(view -> loadingListener.loadMoreData());
         }
 
         private void setActionsVisible(boolean visible) {

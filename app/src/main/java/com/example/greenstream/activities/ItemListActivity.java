@@ -3,6 +3,7 @@ package com.example.greenstream.activities;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -22,6 +23,8 @@ import com.example.greenstream.data.ListState;
 import com.example.greenstream.data.PersonalListType;
 import com.example.greenstream.dialog.AppDialogBuilder;
 import com.example.greenstream.viewmodels.ItemListViewModel;
+
+import java.util.List;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
@@ -52,7 +55,8 @@ public class ItemListActivity extends AppCompatActivity {
         informationListView.setLayoutManager(new LinearLayoutManager(this));
         InformationAdapter<ExtendedInformationItem> adapter = new InformationAdapter<>(createItemActionListener(),
                 () -> viewModel.updatePersonalList(type));
-        viewModel.getPersonalList(type).observe(this, adapter::setData);
+        LiveData<List<ExtendedInformationItem>> personalList = viewModel.getPersonalList(type);
+        personalList.observe(this, adapter::setData);
         informationListView.setAdapter(adapter);
 
         SwipeRefreshLayout swipeRefreshLayout = findViewById(R.id.list_refresh);
@@ -65,11 +69,17 @@ public class ItemListActivity extends AppCompatActivity {
         Button retryButton = findViewById(R.id.retry_button);
         retryButton.setOnClickListener(view -> viewModel.updatePersonalList(type));
         viewModel.getPersonalListState().observe(this, listState -> {
-            adapter.setShowProgressBar(listState != ListState.COMPLETED);
+            adapter.setListState(listState);
             boolean refreshing = swipeRefreshLayout.isRefreshing();
             swipeRefreshLayout.setRefreshing(refreshing && listState == ListState.LOADING);
             swipeRefreshLayout.setVisibility((listState != ListState.FAILED) ? VISIBLE : GONE);
             errorMessage.setVisibility((listState == ListState.FAILED) ? VISIBLE : GONE);
+            boolean viewList =
+                    (listState != ListState.FAILED)
+                            || (personalList.getValue() != null
+                            && !personalList.getValue().isEmpty());
+            swipeRefreshLayout.setVisibility(viewList ? VISIBLE : GONE);
+            errorMessage.setVisibility(viewList ? GONE : VISIBLE);
         });
 
     }
