@@ -134,7 +134,7 @@ public class Repository {
         ListState currentState = personalListState.getValue();
         if (currentState != null && currentState.preventLoadingData())
             return;
-        long start = System.currentTimeMillis();
+        long start = System.currentTimeMillis() / 1000L;
         List<ExtendedInformationItem> listData = personalList.getValue();
         if (listData != null && listData.size() > 0)
             start = type.getPropertyOf(listData.get(listData.size() - 1));
