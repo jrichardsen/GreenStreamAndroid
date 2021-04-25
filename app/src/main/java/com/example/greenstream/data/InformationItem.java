@@ -3,11 +3,8 @@ package com.example.greenstream.data;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.example.greenstream.network.EmbeddedJsonDeserializer;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 /**
  * Data class for an information item.

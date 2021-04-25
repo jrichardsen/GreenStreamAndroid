@@ -2,6 +2,7 @@ package com.example.greenstream.authentication;
 
 import android.accounts.Account;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Response;
 import com.example.greenstream.network.JsonRequest;
 
@@ -23,7 +24,7 @@ public class AuthenticationRequest extends JsonRequest<AppAccount> {
                                  @NotNull Response.ErrorListener errorListener) {
         super(method,
                 url,
-                getTypeFromClass(AppAccount.class),
+                null, getTypeFromClass(AppAccount.class),
                 listener,
                 errorListener
         );
@@ -32,7 +33,7 @@ public class AuthenticationRequest extends JsonRequest<AppAccount> {
     }
 
     @Override
-    protected Map<String, String> getParams() {
+    protected Map<String, String> getParams() throws AuthFailureError {
         Map<String, String> params = new HashMap<>();
         params.put("email", account.name);
         params.put("password", password);

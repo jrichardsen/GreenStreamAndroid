@@ -6,10 +6,10 @@ import android.util.Log;
 
 import androidx.lifecycle.MutableLiveData;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.greenstream.R;
 import com.example.greenstream.authentication.AppAccount;
@@ -22,6 +22,7 @@ import com.example.greenstream.data.PersonalListType;
 import com.fasterxml.jackson.databind.JavaType;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,9 +33,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -54,8 +53,12 @@ public class AppNetworkManager implements AuthenticationServerInterface {
     private final RequestQueue requestQueue;
     private final String serverUrl;
     private final String feedEndpoint;
-
+    private final String propertyWatchedEndpoint;
+    private final String propertyLikedEndpoint;
+    private final String propertyWatchListEndpoint;
     private final String loginEndpoint;
+    private final String recommendationEndpoint;
+    private final String itemEndpoint;
 
     public AppNetworkManager(@NotNull Context context) {
         allowMySSL(context);
@@ -63,6 +66,11 @@ public class AppNetworkManager implements AuthenticationServerInterface {
         serverUrl = context.getString(R.string.server_url);
         feedEndpoint = context.getString(R.string.all_items_endpoint);
         loginEndpoint = context.getString(R.string.login_endpoint);
+        propertyWatchedEndpoint = context.getString(R.string.update_history_endpoint);
+        propertyLikedEndpoint = context.getString(R.string.update_liked_endpoint);
+        propertyWatchListEndpoint = context.getString(R.string.update_watchlist_endpoint);
+        recommendationEndpoint = context.getString(R.string.recommendation_endpoint);
+        itemEndpoint = context.getString(R.string.item_endpoint);
     }
 
     /**
@@ -108,15 +116,13 @@ public class AppNetworkManager implements AuthenticationServerInterface {
         String url = serverUrl + endpoint + "/" + requestAmount;
         if (start != 0)
             url += "/" + start;
-        Log.d(TAG, "Sending network request to: " + url);
-        JavaType type;
-        if (accessToken != null)
-            type = JsonRequest.getListTypeFromClass(ExtendedInformationItem.class);
-        else
-            type = JsonRequest.getListTypeFromClass(InformationItem.class);
+        JavaType type = JsonRequest.getListTypeFromClass((accessToken == null)
+                ? InformationItem.class
+                : ExtendedInformationItem.class);
         Request<?> request = new JsonRequest<List<T>>(
                 Request.Method.GET,
                 url,
+                accessToken,
                 type,
                 (response) -> {
                     if (response.size() == requestAmount) {
@@ -128,25 +134,17 @@ public class AppNetworkManager implements AuthenticationServerInterface {
                         listState.setValue(ListState.COMPLETED);
                     }
                     List<T> data = items.getValue();
-                    if (start == 0 || data == null)
-                        data = response;
-                    else
-                        data.addAll(response);
+
+                    if (start == 0 || data == null) {data = response;}
+                    else {data.addAll(response);}
                     items.setValue(data);
                 },
                 error -> {
                     Log.e(TAG, "Error occurred while loading data", error);
                     listState.setValue(ListState.FAILED);
-                }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> params = new HashMap<>(super.getHeaders());
-                if (accessToken != null)
-                    params.put("Cookie", "jwt=" + accessToken);
-                return params;
-            }
-        }.setTag(tag);
+                }).setTag(tag);
         listState.setValue(ListState.LOADING);
+        Log.d(TAG, "Sending network request to: " + url);
         requestQueue.add(request);
     }
 
@@ -174,6 +172,68 @@ public class AppNetworkManager implements AuthenticationServerInterface {
                 password,
                 listener,
                 errorListener);
+        Log.d(TAG, "Sending network request to: " + url);
+        requestQueue.add(request);
+    }
+
+    public void updateWatchedProperty(long itemId, boolean value, @NotNull String accessToken) {
+        updateInformationProperty(itemId, propertyWatchedEndpoint, value, accessToken);
+    }
+
+    public void updateLikedProperty(long itemId, boolean value, @NotNull String accessToken) {
+        updateInformationProperty(itemId, propertyLikedEndpoint, value, accessToken);
+    }
+
+    public void updateWatchListProperty(long itemId, boolean value, @NotNull String accessToken) {
+        updateInformationProperty(itemId, propertyWatchListEndpoint, value, accessToken);
+    }
+
+    private void updateInformationProperty(long itemId,
+                                          String updatePropertyEndpoint,
+                                          boolean value,
+                                          @NotNull String accessToken) {
+        String url = serverUrl + updatePropertyEndpoint + "/" + itemId;
+        int requestMethod = value ? Request.Method.PUT : Request.Method.DELETE;
+        StringRequest request = new AuthenticatedStringRequest(requestMethod,
+                url,
+                accessToken,
+                null,
+                errorListener);
+        Log.d(TAG, "Sending network request to: " + url);
+        requestQueue.add(request);
+    }
+
+    public void getRecommendation(String accessToken, JsonRequest.ResponseListener<InformationItem> listener) {
+        String url = serverUrl + recommendationEndpoint;
+        JavaType type = JsonRequest.getTypeFromClass((accessToken == null)
+                ? InformationItem.class
+                : ExtendedInformationItem.class);
+        Log.d(TAG, "Sending network request to: " + url);
+        Request<?> request = new JsonRequest<>(
+                Request.Method.GET,
+                url,
+                accessToken, type,
+                listener,
+                errorListener
+        );
+        requestQueue.add(request);
+    }
+
+    public void getItemById(long id,
+                            @Nullable String accessToken,
+                            JsonRequest.ResponseListener<InformationItem> listener) {
+        String url = serverUrl + itemEndpoint + "/" + id;
+        JavaType type = JsonRequest.getTypeFromClass((accessToken == null)
+                ? InformationItem.class
+                : ExtendedInformationItem.class);
+        Request<?> request = new JsonRequest<>(
+                Request.Method.GET,
+                url,
+                accessToken, type,
+                listener,
+                errorListener
+        );
+        Log.d(TAG, "Sending network request to: " + url);
         requestQueue.add(request);
     }
 

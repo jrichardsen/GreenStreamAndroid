@@ -6,12 +6,10 @@ import androidx.lifecycle.MutableLiveData;
 import com.android.volley.NetworkError;
 import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
-import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.jetbrains.annotations.NotNull;
@@ -26,7 +24,7 @@ import java.util.List;
  * @param <T> The type of the received object.
  *           Should be JSON parsable by a standard {@link ObjectMapper}.
  */
-public class JsonRequest<T> extends Request<T> {
+public class JsonRequest<T> extends AuthenticatedRequest<T> {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
     /**
@@ -39,10 +37,11 @@ public class JsonRequest<T> extends Request<T> {
 
     public JsonRequest(int method,
                        @NotNull String url,
+                       @Nullable String accessToken,
                        @NotNull JavaType type,
                        @Nullable ResponseListener<T> listener,
                        @Nullable Response.ErrorListener errorListener) {
-        super(method, url, errorListener);
+        super(method, url, accessToken, errorListener);
         this.type = type;
         this.listener = listener;
     }

@@ -24,9 +24,15 @@
     <string name="liked_items_endpoint">/api/items/liked</string>
     <string name="history_items_endpoint">/api/items/watched</string>
     <string name="watchlist_items_endpoint">/api/items/watchlist</string>
+    <string name="update_liked_endpoint">/api/item/status/liked</string>
+    <string name="update_history_endpoint">/api/item/status/watched</string>
+    <string name="update_watchlist_endpoint">/api/item/status/watchlist</string>
+    <string name="recommendation_endpoint">/api/item/recommended</string>
+    <string name="item_endpoint">/api/item</string>
     <string name="app_data_endpoint">/api/full</string>
     <string name="feedback_endpoint">/api/feedback</string>
     <string name="login_endpoint">/login</string>
+    <string name="item_update_endpoint">/api/item/status</string>
     <string name="user_data_endpoint">/api/fullUser</string>
     <string name="imprint_url">https://appsterdb.ackermann.digital/impressum</string>
 

@@ -108,7 +108,7 @@ public class Repository {
         List<InformationItem> feedData = feed.getValue();
         if (feedData != null)
             loadedItems = feedData.size();
-        String accessToken = tryGetAccessToken(false);
+        String accessToken = tryGetAccessToken();
         networkManager.requestFeed(feed, feedState, REQUEST_BATCH_SIZE, loadedItems, accessToken);
     }
 
@@ -134,11 +134,11 @@ public class Repository {
         ListState currentState = personalListState.getValue();
         if (currentState != null && currentState.preventLoadingData())
             return;
-        long start = System.currentTimeMillis() / 1000L;
+        long start = getUnixTimestamp();
         List<ExtendedInformationItem> listData = personalList.getValue();
         if (listData != null && listData.size() > 0)
             start = type.getPropertyOf(listData.get(listData.size() - 1));
-        String accessToken = tryGetAccessToken(true);
+        String accessToken = tryGetAccessToken();
         networkManager.requestPersonalItems(context,
                 type,
                 personalList,
@@ -155,13 +155,10 @@ public class Repository {
         personalListState.setValue(ListState.READY);
     }
 
-    private String tryGetAccessToken(boolean assertExisting) throws IllegalStateException {
+    private String tryGetAccessToken() {
         AppAccount accountData = account.getValue();
         if (accountData != null)
             return accountData.getAccessToken();
-        else if (assertExisting)
-            throw new IllegalStateException("User is not logged in, " +
-                    "but an access token is needed for this operation");
         return null;
     }
 
@@ -174,11 +171,14 @@ public class Repository {
     }
 
     public void showInformation(InformationItem informationItem) {
-        //TODO: update watched timestamp
+        String accessToken = tryGetAccessToken();
+        if (accessToken != null)
+            networkManager.updateWatchedProperty(informationItem.getId(), true, accessToken);
         Intent intent;
         if (!informationItem.getType().isViewExternal() && preferenceManager.showInApp()) {
             intent = new Intent(context, ViewActivity.class);
-            intent.putExtra(ViewActivity.INFORMATION_EXTRA, informationItem);
+            Log.d(TAG, "Item is extended:" + (informationItem instanceof ExtendedInformationItem));
+            intent.putExtra(ViewActivity.EXTRA_INFORMATION, informationItem);
         } else {
             intent = new Intent(Intent.ACTION_VIEW);
             intent.setData(Uri.parse(informationItem.getUrl()));
@@ -187,12 +187,18 @@ public class Repository {
         context.startActivity(intent);
     }
 
+    private long getUnixTimestamp() {
+        return System.currentTimeMillis() / 1000L;
+    }
+
     public void sendItemFeedback(long id, String feedbackOption, Repository.FeedbackReceivedCallback callback) {
         //TODO: implement method
     }
 
     public void changeWatchLater(long id, boolean b) {
-        //TODO: implement method
+        String accessToken = tryGetAccessToken();
+        if (accessToken != null)
+            networkManager.updateWatchListProperty(id, b, accessToken);
     }
 
     public void cancelNotification() {
@@ -200,32 +206,30 @@ public class Repository {
     }
 
     public void notifyInformation() {
-        //TODO: retrieve information for notification
-        InformationItem informationItem = new InformationItem(
-                135,
-                "https://www.quarks.de/gesundheit/ernaehrung/alles-bio-warum-unsere-fleischwahl-nur-wenig-beeinflusst/",
-                "Bio-Fleisch",
-                "Ist Bio-Fleisch wirklich besser? - Quarks",
-                "de",
-                "Lebensmittel",
-                "Artikel"
-        );
+        String accessToken = tryGetAccessToken();
+        networkManager.getRecommendation(accessToken, this::sendNotification);
+    }
+
+    private void sendNotification(InformationItem informationItem) {
+        //TODO: test if person is logged in, maybe try to log them in;
+        //      then enable watchLater button based on if they are logged in
         notificationManager.notifyInformation(informationItem);
     }
 
     public void setLikeState(long id, boolean liked) {
-        //TODO: implement this
+        String accessToken = tryGetAccessToken();
+        if (accessToken != null)
+            networkManager.updateLikedProperty(id, liked, accessToken);
     }
 
     public void showInformationById(long id) {
         InformationItem informationItem;
-        //TODO: get the information item for the given id
-        //showInformation(informationItem);
+        networkManager.getItemById(id, tryGetAccessToken(), this::showInformation);
     }
 
     public void login(Activity activity, boolean onlyIfAvailable) {
         Account[] accounts = accountManager.getAccounts();
-        // TODO: handle case with multiple accounts
+        //TODO: handle case with multiple accounts
         if (accounts.length == 0) {
             if (!onlyIfAvailable)
                 accountManager.addNewAccount(activity, this::authenticateToAccount);
@@ -242,7 +246,7 @@ public class Repository {
         String encryptedPassword = accountManager.getPasswordForAccount(account);
         try {
             String password = encryptionManager.decryptMsg(context, encryptedPassword);
-            // TODO: also update auth token in account manager
+            //TODO: also update auth token in account manager
             networkManager.login(account, password, this.account::setValue, null);
         } catch (Exception e) {
             Log.e(TAG, "Could not decrypt password", e);

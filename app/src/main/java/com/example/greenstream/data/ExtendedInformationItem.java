@@ -1,6 +1,7 @@
 package com.example.greenstream.data;
 
 import android.os.Parcel;
+import android.os.Parcelable;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -21,6 +22,20 @@ public class ExtendedInformationItem extends InformationItem {
     @JsonProperty("watchlist")
     private long onWatchLaterList;
 
+    public static final Creator<ExtendedInformationItem> CREATOR = new Creator<ExtendedInformationItem>() {
+        @Override
+        public ExtendedInformationItem createFromParcel(Parcel in) {
+            return new ExtendedInformationItem(in);
+        }
+
+        @Override
+        public ExtendedInformationItem[] newArray(int size) {
+            return new ExtendedInformationItem[size];
+        }
+    };
+
+    public ExtendedInformationItem() {}
+
     protected ExtendedInformationItem(Parcel in) {
         super(in);
         lastRecommended = in.readLong();
@@ -28,8 +43,6 @@ public class ExtendedInformationItem extends InformationItem {
         watched = in.readLong();
         onWatchLaterList = in.readLong();
     }
-
-    public ExtendedInformationItem() {}
 
     public long getLastRecommended() {
         return lastRecommended;

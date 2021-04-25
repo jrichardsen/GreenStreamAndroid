@@ -27,7 +27,7 @@ import com.example.greenstream.viewmodels.ViewViewModel;
  */
 public class ViewActivity extends AppCompatActivity {
 
-    public static final String INFORMATION_EXTRA = "INFORMATION_EXTRA";
+    public static final String EXTRA_INFORMATION = "com.example.greenstream.INFORMATION_EXTRA";
 
     private static final String TAG = "ViewActivity";
 
@@ -51,7 +51,7 @@ public class ViewActivity extends AppCompatActivity {
         TextView urlText = findViewById(R.id.url_text);
         ProgressBar progressBar = findViewById(R.id.view_load_progress);
         WebView contentWebView = findViewById(R.id.content_web);
-        informationItem = getIntent().getParcelableExtra(INFORMATION_EXTRA);
+        informationItem = getIntent().getParcelableExtra(EXTRA_INFORMATION);
         if (informationItem == null) {
             Log.e(TAG, "View activity was called without information object");
             finish();
@@ -109,7 +109,7 @@ public class ViewActivity extends AppCompatActivity {
     }
 
     private void openExplanation() {
-        //TODO: implement this
+        viewModel.openExplanation(informationItem.getExplanation());
     }
 
     private void shareItemSelected() {
