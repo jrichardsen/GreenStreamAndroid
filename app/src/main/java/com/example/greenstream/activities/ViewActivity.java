@@ -129,7 +129,7 @@ public class ViewActivity extends AppCompatActivity {
     }
 
     private void feedback() {
-        AppDialogBuilder.feedbackDialog(this, informationItem.getId()).show();
+        viewModel.showFeedbackDialog(this, informationItem);
     }
 
     private void openExternal() {

@@ -3,6 +3,7 @@ package com.example.greenstream;
 import android.accounts.Account;
 import android.app.Activity;
 import android.app.Application;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
@@ -15,9 +16,12 @@ import com.example.greenstream.alarm.AppAlarmManager;
 import com.example.greenstream.authentication.AppAccount;
 import com.example.greenstream.authentication.AppAccountManager;
 import com.example.greenstream.data.ExtendedInformationItem;
+import com.example.greenstream.data.Feedback;
+import com.example.greenstream.data.Label;
 import com.example.greenstream.data.ListState;
 import com.example.greenstream.data.InformationItem;
 import com.example.greenstream.data.PersonalListType;
+import com.example.greenstream.dialog.AppDialogBuilder;
 import com.example.greenstream.encryption.AppEncryptionManager;
 import com.example.greenstream.network.AppNetworkManager;
 import com.example.greenstream.notifications.AppNotificationManager;
@@ -50,6 +54,7 @@ public class Repository {
     private final MutableLiveData<List<ExtendedInformationItem>> personalList;
     private final MutableLiveData<ListState> personalListState;
     private PersonalListType personalListType;
+    private final MutableLiveData<List<Label>> labels;
     private final MutableLiveData<AppAccount> account;
 
     private Repository(Application application) {
@@ -69,6 +74,8 @@ public class Repository {
         personalList = new MutableLiveData<>(new ArrayList<>());
         personalListState = new MutableLiveData<>(ListState.READY);
         personalListType = null;
+        labels = new MutableLiveData<>(null);
+        networkManager.getLabels(labels::setValue);
 
         account.observeForever(appAccount -> {
             resetFeed();
@@ -191,10 +198,6 @@ public class Repository {
         return System.currentTimeMillis() / 1000L;
     }
 
-    public void sendItemFeedback(long id, String feedbackOption, Repository.FeedbackReceivedCallback callback) {
-        //TODO: implement method
-    }
-
     public void changeWatchLater(long id, boolean b) {
         String accessToken = tryGetAccessToken();
         if (accessToken != null)
@@ -206,14 +209,27 @@ public class Repository {
     }
 
     public void notifyInformation() {
+        // TODO: log in before getting recommendation
         String accessToken = tryGetAccessToken();
         networkManager.getRecommendation(accessToken, this::sendNotification);
     }
 
     private void sendNotification(InformationItem informationItem) {
-        //TODO: test if person is logged in, maybe try to log them in;
-        //      then enable watchLater button based on if they are logged in
-        notificationManager.notifyInformation(informationItem);
+        notificationManager.notifyInformation(informationItem, account.getValue() != null);
+    }
+
+    public void showFeedbackDialog(Context context, InformationItem item) {
+        List<Label> labels = this.labels.getValue();
+        if (labels != null) {
+            AppDialogBuilder.feedbackDialog(context, item.getId(), labels, this::sendFeedback).show();
+        }
+        //TODO: send error message if it does not work
+    }
+
+    private void sendFeedback(Feedback feedback) {
+        FeedbackReceivedCallback callback = AppDialogBuilder.getCallbackFromContext(context);
+        String accessToken = tryGetAccessToken();
+        networkManager.sendFeedback(feedback, accessToken, callback);
     }
 
     public void setLikeState(long id, boolean liked) {
@@ -223,8 +239,12 @@ public class Repository {
     }
 
     public void showInformationById(long id) {
-        InformationItem informationItem;
         networkManager.getItemById(id, tryGetAccessToken(), this::showInformation);
+    }
+
+    private boolean accountAvailable() {
+        Account[] accounts = accountManager.getAccounts();
+        return accounts.length > 0;
     }
 
     public void login(Activity activity, boolean onlyIfAvailable) {
@@ -255,6 +275,10 @@ public class Repository {
 
     public LiveData<AppAccount> getAccount() {
         return account;
+    }
+
+    public interface ResponseListener<T> {
+        void onResponse(T object);
     }
 
     public interface FeedbackReceivedCallback {

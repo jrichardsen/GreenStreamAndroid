@@ -1,6 +1,7 @@
 package com.example.greenstream.viewmodels;
 
 import android.app.Application;
+import android.content.Context;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
@@ -36,5 +37,9 @@ public class ItemListViewModel extends AppViewModel {
 
     public void showInformation(InformationItem informationItem) {
         repository.showInformation(informationItem);
+    }
+
+    public void showFeedbackDialog(Context context, InformationItem informationItem) {
+        repository.showFeedbackDialog(context, informationItem);
     }
 }

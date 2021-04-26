@@ -30,11 +30,13 @@
     <string name="recommendation_endpoint">/api/item/recommended</string>
     <string name="item_endpoint">/api/item</string>
     <string name="app_data_endpoint">/api/full</string>
+    <string name="labels_endpoint">/api/labels</string>
     <string name="feedback_endpoint">/api/feedback</string>
     <string name="login_endpoint">/login</string>
     <string name="item_update_endpoint">/api/item/status</string>
     <string name="user_data_endpoint">/api/fullUser</string>
     <string name="imprint_url">https://appsterdb.ackermann.digital/impressum</string>
+    <string name="about_us_url">https://appsterdb.ackermann.digital/about</string>
 
     <!-- Settings activity -->
     <string name="title_activity_settings">Einstellungen</string>
@@ -53,6 +55,7 @@
     <string name="explanation">Erklärung</string>
     <string name="others">Sonstiges</string>
     <string name="imprint">Impressum</string>
+    <string name="about_us">Über uns</string>
     <string name="credentials">Account</string>
 
     <!-- Main activity -->

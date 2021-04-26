@@ -10,6 +10,9 @@ import com.example.greenstream.R;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Locale;
+import java.util.Random;
+
 /**
  * Class for managing the app's {@link SharedPreferences}.
  */
@@ -38,8 +41,13 @@ public class AppPreferenceManager implements SharedPreferences.OnSharedPreferenc
     }
 
     public TimePreference.TimeData getNotificationTime() {
+        final Random random = new Random();
+        // 10:00 - 19:59
+        String randomTime = String.format(Locale.ENGLISH, "%02d:%02d",
+                random.nextInt(10) + 10,
+                random.nextInt(60));
         return TimePreference.parseTimeData(
-                sharedPreferences.getString(NOTIFICATION_TIME_PREF_KEY, "12:00"));
+                sharedPreferences.getString(NOTIFICATION_TIME_PREF_KEY, randomTime));
     }
 
     public boolean showInApp() {

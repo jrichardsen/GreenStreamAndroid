@@ -161,8 +161,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return new InformationAdapter.ItemActionListener() {
             @Override
             public void onFeedbackAction(InformationItem informationItem) {
-                AppDialogBuilder.feedbackDialog(MainActivity.this, informationItem.getId())
-                        .show();
+                viewModel.showFeedbackDialog(MainActivity.this, informationItem);
             }
 
             @Override

@@ -6,20 +6,26 @@ import android.util.Log;
 
 import androidx.lifecycle.MutableLiveData;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.greenstream.R;
+import com.example.greenstream.Repository;
 import com.example.greenstream.authentication.AppAccount;
 import com.example.greenstream.authentication.AuthenticationRequest;
 import com.example.greenstream.authentication.AuthenticationServerInterface;
 import com.example.greenstream.data.ExtendedInformationItem;
+import com.example.greenstream.data.Feedback;
+import com.example.greenstream.data.Label;
 import com.example.greenstream.data.ListState;
 import com.example.greenstream.data.InformationItem;
 import com.example.greenstream.data.PersonalListType;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -33,7 +39,9 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -59,6 +67,8 @@ public class AppNetworkManager implements AuthenticationServerInterface {
     private final String loginEndpoint;
     private final String recommendationEndpoint;
     private final String itemEndpoint;
+    private final String labelsEndpoint;
+    private final String feedbackEndpoint;
 
     public AppNetworkManager(@NotNull Context context) {
         allowMySSL(context);
@@ -71,6 +81,8 @@ public class AppNetworkManager implements AuthenticationServerInterface {
         propertyWatchListEndpoint = context.getString(R.string.update_watchlist_endpoint);
         recommendationEndpoint = context.getString(R.string.recommendation_endpoint);
         itemEndpoint = context.getString(R.string.item_endpoint);
+        labelsEndpoint = context.getString(R.string.labels_endpoint);
+        feedbackEndpoint = context.getString(R.string.feedback_endpoint);
     }
 
     /**
@@ -212,7 +224,8 @@ public class AppNetworkManager implements AuthenticationServerInterface {
         Request<?> request = new JsonRequest<>(
                 Request.Method.GET,
                 url,
-                accessToken, type,
+                accessToken,
+                type,
                 listener,
                 errorListener
         );
@@ -229,11 +242,47 @@ public class AppNetworkManager implements AuthenticationServerInterface {
         Request<?> request = new JsonRequest<>(
                 Request.Method.GET,
                 url,
-                accessToken, type,
+                accessToken,
+                type,
                 listener,
                 errorListener
         );
         Log.d(TAG, "Sending network request to: " + url);
+        requestQueue.add(request);
+    }
+
+    public void getLabels(JsonRequest.ResponseListener<List<Label>> listener) {
+        String url = serverUrl + labelsEndpoint;
+        Request<?> request = new JsonRequest<>(
+                Request.Method.GET,
+                url,
+                null,
+                JsonRequest.getListTypeFromClass(Label.class),
+                listener,
+                errorListener
+        );
+        Log.d(TAG, "Sending network request to: " + url);
+        requestQueue.add(request);
+    }
+
+    public void sendFeedback(Feedback feedback, String accessToken, Repository.FeedbackReceivedCallback callback) {
+        String url = serverUrl + feedbackEndpoint;
+        Request<?> request = new AuthenticatedStringRequest(
+                Request.Method.POST,
+                url,
+                accessToken,
+                response -> callback.onFeedbackReceivedSuccess(),
+                error -> {
+                    errorListener.onErrorResponse(error);
+                    callback.onFeedbackFailed();
+                }
+        ) {
+            @androidx.annotation.Nullable
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                return feedback.asMap();
+            }
+        };
         requestQueue.add(request);
     }
 

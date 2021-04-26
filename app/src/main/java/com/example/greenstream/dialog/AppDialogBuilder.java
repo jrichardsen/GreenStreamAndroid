@@ -15,6 +15,10 @@ import androidx.appcompat.app.AlertDialog;
 
 import com.example.greenstream.R;
 import com.example.greenstream.Repository;
+import com.example.greenstream.data.Feedback;
+import com.example.greenstream.data.Label;
+
+import java.util.List;
 
 /**
  * Utility class for creating dialogs.
@@ -25,20 +29,21 @@ public class AppDialogBuilder {
      * Creates a feedback dialog in the given context for the information item with the given id.
      * A selection between predefined options and a custom text feedback can be made.
      */
-    public static AlertDialog feedbackDialog(Context context, long id) {
+    public static AlertDialog feedbackDialog(Context context, long id, List<Label> labels, Repository.ResponseListener<Feedback> listener) {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        Repository.FeedbackReceivedCallback callback = getCallbackFromContext(context);
+        String[] items = new String[labels.size()];
+        for (int i = 0; i < items.length; i++) {
+            items[i] = labels.get(i).getName();
+        }
 
         return builder.setTitle(R.string.feedback)
-                .setItems(R.array.information_feedback_items, (dialogInterface, i) -> {
-                    String[] feedbackOptions = context.getResources().getStringArray(R.array.information_feedback_items);
-                    if (i == feedbackOptions.length - 1)
-                        // The last item requires a custom message to be entered.
-                        feedbackTextDialog(context, id).show();
+                .setItems(items, (dialogInterface, i) -> {
+                    Label label = labels.get(i);
+                    if (label.getId() == 1)
+                        feedbackTextDialog(context, id, label, listener).show();
                     else
-                        Repository.getInstance((Application) context.getApplicationContext())
-                                .sendItemFeedback(id, feedbackOptions[i], callback);
+                        listener.onResponse(new Feedback(id, label, ""));
                 })
                 .create();
     }
@@ -47,9 +52,8 @@ public class AppDialogBuilder {
      * Creates a custom text feedback dialog in the given context for the information item with the
      * given id.
      */
-    private static AlertDialog feedbackTextDialog(Context context, long id) {
+    private static AlertDialog feedbackTextDialog(Context context, long id, Label label, Repository.ResponseListener<Feedback> listener) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        Repository.FeedbackReceivedCallback callback = getCallbackFromContext(context);
 
         EditText input = new EditText(context);
         input.setInputType(InputType.TYPE_CLASS_TEXT);
@@ -68,18 +72,15 @@ public class AppDialogBuilder {
                 .setMessage(R.string.information_feedback_message)
                 .setView(view)
                 .setNegativeButton(R.string.cancel, (dialogInterface, i) -> dialogInterface.dismiss())
-                .setPositiveButton(R.string.send, ((dialogInterface, i) -> {
-                    Repository.getInstance((Application) context.getApplicationContext())
-                            .sendItemFeedback(id, input.getText().toString(), callback);
-                    dialogInterface.dismiss();
-                }))
+                .setPositiveButton(R.string.send, ((dialogInterface, i) ->
+                        listener.onResponse(new Feedback(id, label, input.getText().toString()))))
                 .create();
     }
 
     /**
      * Creates {@link Toast} messages to notify the user whether the feedback could be send.
      */
-    private static Repository.FeedbackReceivedCallback getCallbackFromContext(Context context) {
+    public static Repository.FeedbackReceivedCallback getCallbackFromContext(Context context) {
         return new Repository.FeedbackReceivedCallback() {
             @Override
             public void onFeedbackReceivedSuccess() {

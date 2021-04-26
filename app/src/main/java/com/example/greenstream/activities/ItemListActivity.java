@@ -102,8 +102,7 @@ public class ItemListActivity extends AppCompatActivity {
         return new InformationAdapter.ItemActionListener() {
             @Override
             public void onFeedbackAction(InformationItem informationItem) {
-                AppDialogBuilder.feedbackDialog(ItemListActivity.this, informationItem.getId())
-                        .show();
+                viewModel.showFeedbackDialog(ItemListActivity.this, informationItem);
             }
 
             @Override

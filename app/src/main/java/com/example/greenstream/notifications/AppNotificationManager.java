@@ -55,7 +55,7 @@ public class AppNotificationManager {
         }
     }
 
-    public void notifyInformation(@NotNull InformationItem informationItem) {
+    public void notifyInformation(@NotNull InformationItem informationItem, boolean isLoggedIn) {
         // Prepare intents
         Intent showIntent = new Intent(context, NotificationActionReceiver.class)
                 .putExtra(NotificationActionReceiver.ACTION_TYPE_EXTRA,
@@ -85,8 +85,9 @@ public class AppNotificationManager {
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(
                         informationItem.getDescription() + " (" + informationItem.getType().getName() + ")"))
                 .setContentIntent(pendingShowIntent)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .addAction(R.drawable.ic_watch_later_24dp,
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+        if(isLoggedIn)
+                builder.addAction(R.drawable.ic_watch_later_24dp,
                         context.getString(R.string.watch_later),
                         pendingWatchLaterIntent);
 

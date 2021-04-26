@@ -2,6 +2,7 @@ package com.example.greenstream.viewmodels;
 
 import android.app.Activity;
 import android.app.Application;
+import android.content.Context;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
@@ -52,5 +53,9 @@ public class MainViewModel extends AppViewModel {
 
     public LiveData<AppAccount> getAccount() {
         return repository.getAccount();
+    }
+
+    public void showFeedbackDialog(Context context, InformationItem informationItem) {
+        repository.showFeedbackDialog(context, informationItem);
     }
 }
