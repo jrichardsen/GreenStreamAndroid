@@ -126,8 +126,8 @@ public class Repository {
     }
 
     public LiveData<List<ExtendedInformationItem>> getPersonalList(PersonalListType type) {
+        resetPersonalList();
         if (personalListType != type) {
-            resetPersonalList();
             personalListType = type;
         }
         return personalList;
@@ -286,6 +286,12 @@ public class Repository {
         switch (personalListType) {
             case LIKED:
                 setLikeState(id, false);
+                List<InformationItem> feedData = feed.getValue();
+                if (feedData != null)
+                    for (InformationItem item : feedData)
+                        if (item instanceof ExtendedInformationItem && item.getId() == id)
+                            ((ExtendedInformationItem) item).setLiked(0);
+                feed.setValue(feedData);
                 break;
             case HISTORY:
                 setWatched(id, false);
