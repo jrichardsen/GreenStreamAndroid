@@ -9,6 +9,7 @@ import androidx.lifecycle.LiveData;
 
 import com.example.greenstream.activities.MainActivity;
 import com.example.greenstream.authentication.AppAccount;
+import com.example.greenstream.data.ExtendedInformationItem;
 import com.example.greenstream.data.ListState;
 import com.example.greenstream.data.InformationItem;
 
@@ -57,5 +58,13 @@ public class MainViewModel extends AppViewModel {
 
     public void showFeedbackDialog(Context context, InformationItem informationItem) {
         repository.showFeedbackDialog(context, informationItem);
+    }
+
+    public void addToWatchLater(InformationItem informationItem) {
+        repository.changeWatchLater(informationItem.getId(), true);
+    }
+
+    public void updateLiked(ExtendedInformationItem informationItem) {
+        repository.setLikeState(informationItem.getId(), informationItem.getLiked() != 0);
     }
 }

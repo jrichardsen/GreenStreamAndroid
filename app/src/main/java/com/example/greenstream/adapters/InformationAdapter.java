@@ -1,21 +1,29 @@
 package com.example.greenstream.adapters;
 
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.LinearLayout;
+import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
+import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.greenstream.R;
+import com.example.greenstream.data.ExtendedInformationItem;
 import com.example.greenstream.data.InformationItem;
 import com.example.greenstream.data.ListState;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.Collections;
 import java.util.List;
 
@@ -30,18 +38,15 @@ public class InformationAdapter<T extends InformationItem>
     private static final int TYPE_ERROR_MESSAGE = 2;
 
     private List<T> data = Collections.emptyList();
-    /**
-     * The view holder for the view that was last clicked.
-     * This view is the only one that might show their actions.
-     */
-    private InformationViewHolder lastSelectedViewHolder = null;
     private int footerType = 0;
     private final ItemActionListener listener;
     private final LoadingListener loadingListener;
+    private final List<Integer> supportedActions;
 
-    public InformationAdapter(ItemActionListener itemClickListener, LoadingListener loadingListener) {
+    public InformationAdapter(ItemActionListener itemClickListener, LoadingListener loadingListener, List<Integer> supportedActions) {
         listener = itemClickListener;
         this.loadingListener = loadingListener;
+        this.supportedActions = supportedActions;
     }
 
     public void setData(@NotNull List<T> data) {
@@ -69,14 +74,14 @@ public class InformationAdapter<T extends InformationItem>
         else
             view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.error_item, parent, false);
-        return new InformationViewHolder(view, viewType, this::onItemClicked);
+        return new InformationViewHolder(view, viewType, listener, supportedActions);
     }
 
     @Override
     public void onBindViewHolder(@NonNull InformationViewHolder holder, int position) {
         int viewType = getItemViewType(position);
         if (viewType == TYPE_ITEM)
-            holder.bind(data.get(position), listener);
+            holder.bind(data.get(position));
         else if (viewType == TYPE_PROGRESS_BAR)
             // load new data as soon as the progress bar is bound to a view holder
             loadingListener.loadMoreData();
@@ -88,25 +93,6 @@ public class InformationAdapter<T extends InformationItem>
     public int getItemCount() {
         // Get one extra item for showing the progress bar
         return data.size() + ((footerType != 0) ? 1 : 0);
-    }
-
-    /**
-     * If a view was clicked, toggle the visibility of its actions.
-     * If another view was showing their actions beforehand, these must now be set invisible.
-     *
-     * @param viewHolder The view holder that was clicked
-     */
-    private void onItemClicked(InformationViewHolder viewHolder) {
-        if (viewHolder.equals(lastSelectedViewHolder))
-            // Toggle visibility for actions
-            viewHolder.setActionsVisible(!viewHolder.areActionsVisible());
-        else {
-            if (lastSelectedViewHolder != null)
-                // Set actions of the last view invisible
-                lastSelectedViewHolder.setActionsVisible(false);
-            viewHolder.setActionsVisible(true);
-            lastSelectedViewHolder = viewHolder;
-        }
     }
 
     public void setListState(ListState listState) {
@@ -121,15 +107,19 @@ public class InformationAdapter<T extends InformationItem>
         }
     }
 
-    public interface ItemListener {
-        void onItemClicked(InformationViewHolder viewHolder);
-    }
-
     public interface ItemActionListener {
 
-        void onFeedbackAction(InformationItem informationItem);
+        @Retention(RetentionPolicy.SOURCE)
+        @IntDef({ACTION_SHOW, ACTION_FEEDBACK, ACTION_WATCH_LATER, ACTION_LIKE, ACTION_REMOVE_ITEM})
+        @interface ActionType {}
 
-        void onShowAction(InformationItem informationItem);
+        int ACTION_SHOW = 0;
+        int ACTION_FEEDBACK = 1;
+        int ACTION_WATCH_LATER = 2;
+        int ACTION_LIKE = 3;
+        int ACTION_REMOVE_ITEM = 4;
+
+        void onAction(@ActionType int action, InformationItem informationItem);
     }
 
     public interface LoadingListener {
@@ -139,53 +129,110 @@ public class InformationAdapter<T extends InformationItem>
     /**
      * Class representing the view holder of this adapter.
      */
-    static class InformationViewHolder extends RecyclerView.ViewHolder {
+    static class InformationViewHolder extends RecyclerView.ViewHolder implements PopupMenu.OnMenuItemClickListener {
 
+        private final View itemView;
         private TextView titleText;
         private TextView typeText;
         private TextView descriptionText;
-        private LinearLayout actionLayout;
-        private Button feedbackButton;
-        private Button showButton;
-        private boolean actionsVisible;
+        private ImageView likedButton;
+        private ImageView overflowMenuButton;
 
         private Button retryButton;
+        private InformationItem informationItem;
+        private final ItemActionListener listener;
+        private final List<Integer> supportedActions;
 
-        InformationViewHolder(@NonNull View itemView, int viewType, ItemListener listener) {
+        InformationViewHolder(@NonNull View itemView, int viewType, ItemActionListener listener, List<Integer> supportedActions) {
             super(itemView);
+            this.itemView = itemView;
+            this.listener = listener;
+            this.supportedActions = supportedActions;
             if (viewType == TYPE_ITEM) {
-                itemView.setOnClickListener(view -> listener.onItemClicked(this));
                 titleText = itemView.findViewById(R.id.title_text);
                 typeText = itemView.findViewById(R.id.type_text);
                 descriptionText = itemView.findViewById(R.id.description_text);
-                actionLayout = itemView.findViewById(R.id.information_action_layout);
-                feedbackButton = itemView.findViewById(R.id.feedback_button);
-                showButton = itemView.findViewById(R.id.show_button);
-            } else if(viewType == TYPE_ERROR_MESSAGE) {
+                likedButton = itemView.findViewById(R.id.liked_action_item);
+                overflowMenuButton = itemView.findViewById(R.id.overflow_menu_button);
+            } else if (viewType == TYPE_ERROR_MESSAGE) {
                 retryButton = itemView.findViewById(R.id.retry_button);
             }
         }
 
-        private void bind(@NotNull InformationItem informationItem, ItemActionListener listener) {
+        private void bind(@NotNull InformationItem informationItem) {
+            this.informationItem = informationItem;
+            if (supportedActions.contains(ItemActionListener.ACTION_SHOW))
+                itemView.setOnClickListener(view -> listener.onAction(ItemActionListener.ACTION_SHOW, informationItem));
             titleText.setText(informationItem.getTitle());
             typeText.setText(informationItem.getType().getName());
             descriptionText.setText(informationItem.getDescription());
-            setActionsVisible(false);
-            feedbackButton.setOnClickListener(view -> listener.onFeedbackAction(informationItem));
-            showButton.setOnClickListener(view -> listener.onShowAction(informationItem));
+            overflowMenuButton.setOnClickListener(this::showPopup);
+            updateLikedIcon();
+            likedButton.setOnClickListener(view -> {
+                if (informationItem instanceof ExtendedInformationItem) {
+                    ExtendedInformationItem extended = (ExtendedInformationItem) informationItem;
+                    long liked = extended.getLiked();
+                    if (liked == 0)
+                        liked = System.currentTimeMillis() / 1000L;
+                    else
+                        liked = 0;
+                    extended.setLiked(liked);
+                    listener.onAction(ItemActionListener.ACTION_LIKE, extended);
+                    updateLikedIcon();
+                }
+            });
+        }
+
+        private void updateLikedIcon() {
+            if (supportedActions.contains(ItemActionListener.ACTION_LIKE) && this.informationItem instanceof ExtendedInformationItem) {
+                likedButton.setVisibility(View.VISIBLE);
+                likedButton.setImageDrawable(ResourcesCompat.getDrawable(itemView.getResources(),
+                        (((ExtendedInformationItem) informationItem).getLiked() != 0)
+                                ? R.drawable.ic_liked_on_24dp
+                                : R.drawable.ic_liked_off_24dp
+                        , null));
+            } else
+                likedButton.setVisibility(View.GONE);
+        }
+
+        private void showPopup(View view) {
+            PopupMenu popup = new PopupMenu(view.getContext(), view);
+            popup.setOnMenuItemClickListener(this);
+            popup.inflate(R.menu.item_actions_menu);
+            Menu menu = popup.getMenu();
+            boolean extended = informationItem instanceof ExtendedInformationItem;
+            menu.findItem(R.id.feedback_action_item).setVisible(
+                    supportedActions.contains(ItemActionListener.ACTION_FEEDBACK)
+            );
+            menu.findItem(R.id.watch_later_action_item).setVisible(
+                    supportedActions.contains(ItemActionListener.ACTION_WATCH_LATER)
+                            && extended
+            );
+            menu.findItem(R.id.remove_item_action).setVisible(
+                    supportedActions.contains(ItemActionListener.ACTION_REMOVE_ITEM)
+            );
+            popup.show();
         }
 
         private void bindErrorItem(LoadingListener loadingListener) {
             retryButton.setOnClickListener(view -> loadingListener.loadMoreData());
         }
 
-        private void setActionsVisible(boolean visible) {
-            actionsVisible = visible;
-            actionLayout.setVisibility(visible ? View.VISIBLE : View.GONE);
-        }
-
-        boolean areActionsVisible() {
-            return actionsVisible;
+        @Override
+        public boolean onMenuItemClick(MenuItem menuItem) {
+            int id = menuItem.getItemId();
+            if (id == R.id.feedback_action_item) {
+                listener.onAction(ItemActionListener.ACTION_FEEDBACK, informationItem);
+                return true;
+            }
+            if (id == R.id.watch_later_action_item) {
+                listener.onAction(ItemActionListener.ACTION_WATCH_LATER, informationItem);
+                return true;
+            }
+            if (id == R.id.remove_item_action) {
+                listener.onAction(ItemActionListener.ACTION_REMOVE_ITEM, informationItem);
+            }
+            return false;
         }
     }
 }

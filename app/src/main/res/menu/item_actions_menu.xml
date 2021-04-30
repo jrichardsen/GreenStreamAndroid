@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/watch_later_action_item"
+        android:icon="@drawable/ic_watch_later_24dp"
+        android:title="@string/watch_later" />
+    <item
+        android:id="@+id/feedback_action_item"
+        android:title="@string/feedback" />
+    <item
+        android:id="@+id/remove_item_action"
+        android:title="@string/remove_from_list" />
+</menu>

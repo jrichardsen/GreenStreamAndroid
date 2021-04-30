@@ -64,6 +64,7 @@
     <string name="liked">Favoriten</string>
     <string name="watch_later">Später ansehen</string>
     <string name="history">Verlauf</string>
+    <string name="remove_from_list">Aus der Liste entfernen</string>
     <string name="get_notification">Informiere mich</string>
     <string name="information_notification_dialog_title">Ansehen?</string>
     <string name="no">Nein</string>

@@ -178,9 +178,7 @@ public class Repository {
     }
 
     public void showInformation(InformationItem informationItem) {
-        String accessToken = tryGetAccessToken();
-        if (accessToken != null)
-            networkManager.updateWatchedProperty(informationItem.getId(), true, accessToken);
+        setWatched(informationItem.getId(), true);
         Intent intent;
         if (!informationItem.getType().isViewExternal() && preferenceManager.showInApp()) {
             intent = new Intent(context, ViewActivity.class);
@@ -192,6 +190,12 @@ public class Repository {
         }
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
+    }
+
+    private void setWatched(long id, boolean watched) {
+        String accessToken = tryGetAccessToken();
+        if (accessToken != null)
+            networkManager.updateWatchedProperty(id, true, accessToken);
     }
 
     private long getUnixTimestamp() {
@@ -275,6 +279,27 @@ public class Repository {
 
     public LiveData<AppAccount> getAccount() {
         return account;
+    }
+
+    public void removeFromPersonalList(InformationItem informationItem) {
+        long id = informationItem.getId();
+        switch (personalListType) {
+            case LIKED:
+                setLikeState(id, false);
+                break;
+            case HISTORY:
+                setWatched(id, false);
+                break;
+            case WATCH_LATER:
+                changeWatchLater(id, false);
+                break;
+        }
+        List<ExtendedInformationItem> data = personalList.getValue();
+        if (data != null) {
+            //noinspection SuspiciousMethodCalls
+            data.remove(informationItem);
+        }
+        personalList.setValue(data);
     }
 
     public interface ResponseListener<T> {

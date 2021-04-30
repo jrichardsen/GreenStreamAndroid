@@ -23,18 +23,22 @@ import android.widget.TextView;
 import com.example.greenstream.R;
 import com.example.greenstream.adapters.InformationAdapter;
 import com.example.greenstream.authentication.AppAccount;
+import com.example.greenstream.data.ExtendedInformationItem;
 import com.example.greenstream.data.ListState;
 import com.example.greenstream.data.InformationItem;
 import com.example.greenstream.data.PersonalListType;
-import com.example.greenstream.dialog.AppDialogBuilder;
 import com.example.greenstream.viewmodels.MainViewModel;
 import com.google.android.material.navigation.NavigationView;
 
+import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
+import static com.example.greenstream.adapters.InformationAdapter.ItemActionListener.ACTION_FEEDBACK;
+import static com.example.greenstream.adapters.InformationAdapter.ItemActionListener.ACTION_LIKE;
+import static com.example.greenstream.adapters.InformationAdapter.ItemActionListener.ACTION_SHOW;
+import static com.example.greenstream.adapters.InformationAdapter.ItemActionListener.ACTION_WATCH_LATER;
 
 /**
  * Class representing the activity that feeds content to the user.
@@ -74,7 +78,30 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         RecyclerView informationListView = findViewById(R.id.information_list);
         informationListView.setLayoutManager(new LinearLayoutManager(this));
-        InformationAdapter<InformationItem> adapter = new InformationAdapter<>(createItemActionListener(), viewModel::updateFeed);
+        List<Integer> supportedActions = Arrays.asList(
+                ACTION_SHOW,
+                ACTION_FEEDBACK,
+                ACTION_LIKE,
+                ACTION_WATCH_LATER
+        );
+        InformationAdapter<InformationItem> adapter = new InformationAdapter<>((action, informationItem) ->
+        {
+            switch (action) {
+                case ACTION_SHOW:
+                    viewModel.showInformation(informationItem);
+                    break;
+                case InformationAdapter.ItemActionListener.ACTION_FEEDBACK:
+                    viewModel.showFeedbackDialog(this, informationItem);
+                    break;
+                case InformationAdapter.ItemActionListener.ACTION_WATCH_LATER:
+                    viewModel.addToWatchLater(informationItem);
+                    break;
+                case InformationAdapter.ItemActionListener.ACTION_LIKE:
+                    if (informationItem instanceof ExtendedInformationItem)
+                        viewModel.updateLiked((ExtendedInformationItem) informationItem);
+                    break;
+            }
+        }, viewModel::updateFeed, supportedActions);
         LiveData<List<InformationItem>> feed = viewModel.getFeed();
         feed.observe(this, adapter::setData);
         informationListView.setAdapter(adapter);
@@ -94,7 +121,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             swipeRefreshLayout.setRefreshing(refreshing && listState == ListState.LOADING);
             boolean viewList =
                     (listState != ListState.FAILED)
-                    || (feed.getValue() != null && !feed.getValue().isEmpty());
+                            || (feed.getValue() != null && !feed.getValue().isEmpty());
             swipeRefreshLayout.setVisibility(viewList ? VISIBLE : GONE);
             errorMessage.setVisibility(viewList ? GONE : VISIBLE);
         });
@@ -150,25 +177,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             drawer.closeDrawer(GravityCompat.START);
             return true;
         }
-    }
-
-    /**
-     * Creates the listener that listens to actions on the information items, namely
-     * - showing the information
-     * - giving feedback on the information
-     */
-    private InformationAdapter.ItemActionListener createItemActionListener() {
-        return new InformationAdapter.ItemActionListener() {
-            @Override
-            public void onFeedbackAction(InformationItem informationItem) {
-                viewModel.showFeedbackDialog(MainActivity.this, informationItem);
-            }
-
-            @Override
-            public void onShowAction(InformationItem informationItem) {
-                viewModel.showInformation(informationItem);
-            }
-        };
     }
 
     /**

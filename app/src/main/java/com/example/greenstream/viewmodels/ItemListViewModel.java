@@ -42,4 +42,12 @@ public class ItemListViewModel extends AppViewModel {
     public void showFeedbackDialog(Context context, InformationItem informationItem) {
         repository.showFeedbackDialog(context, informationItem);
     }
+
+    public void updateLiked(ExtendedInformationItem informationItem) {
+        repository.setLikeState(informationItem.getId(), informationItem.getLiked() != 0);
+    }
+
+    public void removeFromPersonalList(InformationItem informationItem) {
+        repository.removeFromPersonalList(informationItem);
+    }
 }
