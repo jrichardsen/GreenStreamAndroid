@@ -67,4 +67,8 @@ public class MainViewModel extends AppViewModel {
     public void updateLiked(ExtendedInformationItem informationItem) {
         repository.setLikeState(informationItem.getId(), informationItem.getLiked() != 0);
     }
+
+    public void changeAccount(AppAccount account) {
+        repository.updateAccount(account);
+    }
 }

@@ -277,10 +277,28 @@ public class AppNetworkManager implements AuthenticationServerInterface {
                     callback.onFeedbackFailed();
                 }
         ) {
-            @androidx.annotation.Nullable
+            @Nullable
             @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
+            protected Map<String, String> getParams() {
                 return feedback.asMap();
+            }
+        };
+        requestQueue.add(request);
+    }
+
+    public void updateAccount(AppAccount account) {
+        String url = serverUrl + "/api/user" + "/" + account.getId();
+        Request<?> request = new AuthenticatedStringRequest(
+                Request.Method.PUT,
+                url,
+                account.getAccessToken(),
+                null,
+                errorListener
+        ) {
+            @Nullable
+            @Override
+            protected Map<String, String> getParams() {
+                return account.asMap();
             }
         };
         requestQueue.add(request);

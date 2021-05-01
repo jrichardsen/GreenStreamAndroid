@@ -1,6 +1,7 @@
 package com.example.greenstream.activities;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -48,12 +50,14 @@ import static com.example.greenstream.adapters.InformationAdapter.ItemActionList
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final String TAG = "MainActivity";
+    public static final int REQUEST_EDIT_ACCOUNT = 0;
 
     private MainViewModel viewModel;
     private DrawerLayout drawer;
     private ActionBarDrawerToggle actionBarDrawerToggle;
     private NavigationView navigationView;
     private View accountView;
+    private LiveData<AppAccount> account;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,7 +78,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         accountView.setOnClickListener(this::onAccountViewClicked);
 
         viewModel.login(this, true);
-        viewModel.getAccount().observe(this, this::onAccountUpdate);
+        account = viewModel.getAccount();
+        account.observe(this, this::onAccountUpdate);
 
         RecyclerView informationListView = findViewById(R.id.information_list);
         informationListView.setLayoutManager(new LinearLayoutManager(this));
@@ -143,7 +148,28 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void onAccountViewClicked(View view) {
-        viewModel.logout();
+        Intent intent = new Intent(this, AccountActivity.class);
+        AppAccount accountData = account.getValue();
+        intent.putExtra(AccountActivity.EXTRA_ACCOUNT, accountData);
+        startActivityForResult(intent, REQUEST_EDIT_ACCOUNT);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_EDIT_ACCOUNT) {
+            if (resultCode == Activity.RESULT_OK) {
+                AppAccount account;
+                if (data != null) {
+                    account = data.getParcelableExtra(AccountActivity.EXTRA_ACCOUNT);
+                    if (account == null)
+                        viewModel.logout();
+                    else
+                        viewModel.changeAccount(account);
+                }
+            }
+        }
     }
 
     @Override

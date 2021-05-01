@@ -195,7 +195,7 @@ public class Repository {
     private void setWatched(long id, boolean watched) {
         String accessToken = tryGetAccessToken();
         if (accessToken != null)
-            networkManager.updateWatchedProperty(id, true, accessToken);
+            networkManager.updateWatchedProperty(id, watched, accessToken);
     }
 
     private long getUnixTimestamp() {
@@ -213,9 +213,21 @@ public class Repository {
     }
 
     public void notifyInformation() {
-        // TODO: log in before getting recommendation
-        String accessToken = tryGetAccessToken();
-        networkManager.getRecommendation(accessToken, this::sendNotification);
+        Account[] accounts = accountManager.getAccounts();
+        if (accounts.length > 0) {
+            String encryptedPassword = accountManager.getPasswordForAccount(accounts[0]);
+            try {
+                String password = encryptionManager.decryptMsg(context, encryptedPassword);
+                networkManager.login(accounts[0], password, account ->
+                        networkManager.getRecommendation(account.getAccessToken(), this::sendNotification),
+                        error -> networkManager.getRecommendation(null, this::sendNotification));
+            } catch (Exception e) {
+                Log.e(TAG, "Could not decrypt password", e);
+                networkManager.getRecommendation(null, this::sendNotification);
+            }
+        } else {
+            networkManager.getRecommendation(null, this::sendNotification);
+        }
     }
 
     private void sendNotification(InformationItem informationItem) {
@@ -306,6 +318,11 @@ public class Repository {
             data.remove(informationItem);
         }
         personalList.setValue(data);
+    }
+
+    public void updateAccount(AppAccount account) {
+        this.account.setValue(account);
+        networkManager.updateAccount(account);
     }
 
     public interface ResponseListener<T> {
