@@ -17,6 +17,7 @@
     <string name="last_topic_pref_key">LAST_TOPIC_PREF_KEY</string>
     <string name="user_email_pref_key">USER_EMAIL_PREF_KEY</string>
     <string name="user_password_pref_key">USER_PASSWORD_PREF_KEY</string>
+    <string name="auto_login_account_pref_key">AUTO_LOGIN_ACCOUNT_PREF_KEY</string>
 
     <!-- Links -->
     <string name="server_url">https://deingreenstream.de</string>
@@ -110,5 +111,6 @@
     <string name="save">Speichern</string>
     <string name="account_activity_title">Account</string>
     <string name="username">Nutzername</string>
+    <string name="add_account">Neuer Acccount</string>
 
 </resources>

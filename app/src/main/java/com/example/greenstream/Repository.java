@@ -219,7 +219,7 @@ public class Repository {
             try {
                 String password = encryptionManager.decryptMsg(context, encryptedPassword);
                 networkManager.login(accounts[0], password, account ->
-                        networkManager.getRecommendation(account.getAccessToken(), this::sendNotification),
+                                networkManager.getRecommendation(account.getAccessToken(), this::sendNotification),
                         error -> networkManager.getRecommendation(null, this::sendNotification));
             } catch (Exception e) {
                 Log.e(TAG, "Could not decrypt password", e);
@@ -265,25 +265,50 @@ public class Repository {
 
     public void login(Activity activity, boolean onlyIfAvailable) {
         Account[] accounts = accountManager.getAccounts();
-        //TODO: handle case with multiple accounts
-        if (accounts.length == 0) {
-            if (!onlyIfAvailable)
-                accountManager.addNewAccount(activity, this::authenticateToAccount);
-            return;
+        String accountName = preferenceManager.getAutoLoginAccountName();
+        if (accountName != null) {
+            Account account = null;
+            for (Account a : accounts) {
+                if (a.name.equals(accountName))
+                    account = a;
+            }
+            if (account != null) {
+                authenticateToAccount(account);
+                return;
+            }
         }
-        authenticateToAccount(accounts[0]);
+        if (!onlyIfAvailable) {
+            if (accounts.length == 0)
+                addNewAccount(activity);
+            else {
+                AppDialogBuilder.accountSelectionDialog(activity,
+                        accounts,
+                        account -> {
+                            if (account != null)
+                                authenticateToAccount(account);
+                            else
+                                addNewAccount(activity);
+                        }).show();
+            }
+
+        }
+    }
+
+    private void addNewAccount(Activity activity) {
+        accountManager.addNewAccount(activity, this::authenticateToAccount);
     }
 
     public void logout() {
         account.setValue(null);
+        preferenceManager.updateAutoLoginAccountName(null);
     }
 
     private void authenticateToAccount(Account account) {
         String encryptedPassword = accountManager.getPasswordForAccount(account);
         try {
             String password = encryptionManager.decryptMsg(context, encryptedPassword);
-            //TODO: also update auth token in account manager
             networkManager.login(account, password, this.account::setValue, null);
+            preferenceManager.updateAutoLoginAccountName(account.name);
         } catch (Exception e) {
             Log.e(TAG, "Could not decrypt password", e);
         }

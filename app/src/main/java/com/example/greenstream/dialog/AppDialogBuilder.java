@@ -1,7 +1,8 @@
 package com.example.greenstream.dialog;
 
+import android.accounts.Account;
 import android.annotation.SuppressLint;
-import android.app.Application;
+import android.app.Activity;
 import android.content.Context;
 import android.text.InputFilter;
 import android.text.InputType;
@@ -74,6 +75,20 @@ public class AppDialogBuilder {
                 .setNegativeButton(R.string.cancel, (dialogInterface, i) -> dialogInterface.dismiss())
                 .setPositiveButton(R.string.send, ((dialogInterface, i) ->
                         listener.onResponse(new Feedback(id, label, input.getText().toString()))))
+                .create();
+    }
+
+    public static AlertDialog accountSelectionDialog(Activity activity, Account[] accounts, Repository.ResponseListener<Account> responseListener) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        String[] items = new String[accounts.length + 1];
+        for (int i = 0; i < accounts.length; i++) {
+            items[i] = accounts[i].name;
+        }
+        items[accounts.length] = activity.getString(R.string.add_account);
+
+        return builder.setTitle(R.string.account_activity_title)
+                .setItems(items, (dialogInterface, i) ->
+                        responseListener.onResponse((i < accounts.length) ? accounts[i] : null))
                 .create();
     }
 

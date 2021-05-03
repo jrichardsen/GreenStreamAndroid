@@ -23,6 +23,7 @@ public class AppPreferenceManager implements SharedPreferences.OnSharedPreferenc
     private final String DAILY_NOTIFICATION_PREF_KEY;
     private final String NOTIFICATION_TIME_PREF_KEY;
     private final String SHOW_IN_APP_PREF_KEY;
+    private final String AUTO_LOGIN_ACCOUNT_PREF_KEY;
 
     private final SharedPreferences sharedPreferences;
     private final SchedulingPreferencesUpdateListener listener;
@@ -34,6 +35,7 @@ public class AppPreferenceManager implements SharedPreferences.OnSharedPreferenc
         DAILY_NOTIFICATION_PREF_KEY = context.getString(R.string.daily_notification_pref_key);
         NOTIFICATION_TIME_PREF_KEY = context.getString(R.string.notification_time_pref_key);
         SHOW_IN_APP_PREF_KEY = context.getString(R.string.show_in_app_pref_key);
+        AUTO_LOGIN_ACCOUNT_PREF_KEY = context.getString(R.string.auto_login_account_pref_key);
     }
 
     public boolean dailyNotificationsEnabled() {
@@ -48,6 +50,14 @@ public class AppPreferenceManager implements SharedPreferences.OnSharedPreferenc
                 random.nextInt(60));
         return TimePreference.parseTimeData(
                 sharedPreferences.getString(NOTIFICATION_TIME_PREF_KEY, randomTime));
+    }
+
+    public String getAutoLoginAccountName() {
+        return sharedPreferences.getString(AUTO_LOGIN_ACCOUNT_PREF_KEY, null);
+    }
+
+    public void updateAutoLoginAccountName(String accountName) {
+        sharedPreferences.edit().putString(AUTO_LOGIN_ACCOUNT_PREF_KEY, accountName).apply();
     }
 
     public boolean showInApp() {
