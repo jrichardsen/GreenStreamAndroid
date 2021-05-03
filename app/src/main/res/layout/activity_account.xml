@@ -9,8 +9,7 @@
     <LinearLayout
         android:id="@+id/header"
         android:layout_width="match_parent"
-        android:layout_height="120dp"
-        android:background="@drawable/account_background"
+        android:layout_height="0dp"
         android:gravity="bottom"
         android:orientation="vertical"
         android:padding="16dp"
@@ -18,12 +17,11 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
+        <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/account_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-            tools:text="Max Mustermann" />
+            android:hint="@string/username" />
 
         <TextView
             android:id="@+id/account_email"

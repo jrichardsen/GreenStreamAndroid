@@ -9,12 +9,16 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -30,6 +34,7 @@ public class AccountActivity extends AppCompatActivity {
     public static final String EXTRA_ACCOUNT = "EXTRA_ACCOUNT";
 
     private AppAccount account;
+    private EditText accountName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +49,7 @@ public class AccountActivity extends AppCompatActivity {
 
         account = getIntent().getParcelableExtra(EXTRA_ACCOUNT);
 
-        TextView accountName = findViewById(R.id.account_name);
+        accountName = findViewById(R.id.account_name);
         accountName.setText(account.getUsername());
 
         TextView accountEmail = findViewById(R.id.account_email);
@@ -74,10 +79,28 @@ public class AccountActivity extends AppCompatActivity {
 
         Button saveButton = findViewById(R.id.save_button);
         saveButton.setOnClickListener(this::onSave);
+
+        accountName.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                // do nothing
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                saveButton.setEnabled(!TextUtils.isEmpty(charSequence));
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                // do nothing
+            }
+        });
     }
 
     private void onSave(View view) {
         Intent returnIntent = new Intent();
+        account.setUsername(accountName.getText().toString());
         returnIntent.putExtra(EXTRA_ACCOUNT, account);
         setResult(RESULT_OK, returnIntent);
         finish();

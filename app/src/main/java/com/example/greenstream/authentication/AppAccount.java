@@ -17,7 +17,7 @@ import java.util.Map;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AppAccount implements Parcelable {
     private final long id;
-    private final String username;
+    private String username;
     private final String email;
     @JsonProperty("access_token")
     private final String accessToken;
@@ -62,6 +62,10 @@ public class AppAccount implements Parcelable {
 
     public String getUsername() {
         return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getEmail() {
