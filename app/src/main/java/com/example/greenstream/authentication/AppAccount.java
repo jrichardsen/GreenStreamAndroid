@@ -105,16 +105,12 @@ public class AppAccount implements Parcelable {
     public Map<String, String> asMap() {
         Map<String, String> map = new HashMap<>();
         map.put("username", username);
-        StringBuilder selectedTopicIdsBuilder = new StringBuilder();
+        int i = 0;
         for (SelectableTopic topic : topics) {
-            if (topic.isSelected())
-                selectedTopicIdsBuilder.append(topic.getId()).append(" ");
+            if (topic.isSelected()) {
+                map.put("topics[" + (i++) + "]", String.valueOf(topic.getId()));
+            }
         }
-        String selectedTopicIds = selectedTopicIdsBuilder.toString();
-        if (selectedTopicIds.equals(""))
-            map.put("topics", "");
-        else
-            map.put("topics", selectedTopicIds.substring(0, selectedTopicIds.length() - 1));
         return map;
     }
 }
