@@ -111,12 +111,12 @@ public class Repository {
         ListState currentState = feedState.getValue();
         if (currentState != null && currentState.preventLoadingData())
             return;
-        long loadedItems = 0;
+        long position = 0;
         List<InformationItem> feedData = feed.getValue();
-        if (feedData != null)
-            loadedItems = feedData.size();
+        if (feedData != null && !feedData.isEmpty())
+            position = feedData.get(feedData.size() - 1).getPosition();
         String accessToken = tryGetAccessToken();
-        networkManager.requestFeed(feed, feedState, REQUEST_BATCH_SIZE, loadedItems, accessToken);
+        networkManager.requestFeed(feed, feedState, REQUEST_BATCH_SIZE, position, accessToken);
     }
 
     public void resetFeed() {

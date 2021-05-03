@@ -93,15 +93,15 @@ public class AppNetworkManager implements AuthenticationServerInterface {
      * @param feedState   Updates the feed state when beginning and ending loading, will not check
      *                    the feedback state based on loading items
      * @param amount      The amount of items to load
-     * @param loadedItems The amount of already loaded items. If this is zero, a new feed will
+     * @param position    The amount of the last loaded item. If this is zero, a new feed will
      *                    be requested and overwrite any previous data.
      */
     public void requestFeed(MutableLiveData<List<InformationItem>> feed,
                             MutableLiveData<ListState> feedState,
                             int amount,
-                            long loadedItems,
+                            long position,
                             String accessToken) {
-        requestItems(feed, feedState, amount, loadedItems, accessToken, feedEndpoint, FEED_REQUEST_TAG);
+        requestItems(feed, feedState, amount, position, accessToken, feedEndpoint, FEED_REQUEST_TAG);
     }
 
     public void requestPersonalItems(Context context,

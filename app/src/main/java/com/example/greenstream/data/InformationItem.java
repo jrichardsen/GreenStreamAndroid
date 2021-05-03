@@ -21,6 +21,7 @@ public class InformationItem implements Parcelable {
     private Type type;
     @JsonProperty("explanation_id")
     private long explanation;
+    private long position;
 
     public static final Creator<InformationItem> CREATOR = new Creator<InformationItem>() {
         @Override
@@ -139,5 +140,13 @@ public class InformationItem implements Parcelable {
 
     public void setExplanation(long explanation) {
         this.explanation = explanation;
+    }
+
+    public long getPosition() {
+        return position;
+    }
+
+    public void setPosition(long position) {
+        this.position = position;
     }
 }
