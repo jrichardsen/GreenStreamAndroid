@@ -134,9 +134,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Log.d(TAG, "Activity created");
     }
 
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = findViewById(R.id.drawer);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
     private void onAccountUpdate(AppAccount account) {
-        TextView loginName = findViewById(R.id.login_name);
-        TextView loginEmail = findViewById(R.id.login_email);
+        TextView loginName = accountView.findViewById(R.id.login_name);
+        TextView loginEmail = accountView.findViewById(R.id.login_email);
         boolean hasAccount = (account != null);
         accountView.setVisibility(hasAccount ? VISIBLE : GONE);
         navigationView.getMenu().setGroupVisible(R.id.nav_group_login, !hasAccount);
