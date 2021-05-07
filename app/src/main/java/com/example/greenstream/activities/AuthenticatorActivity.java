@@ -5,15 +5,23 @@ import android.accounts.AccountAuthenticatorActivity;
 import android.accounts.AccountManager;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 
 import com.example.greenstream.R;
 import com.example.greenstream.authentication.AccountConstants;
+import com.example.greenstream.authentication.AuthenticationServerInterface;
 import com.example.greenstream.authentication.DedicatedAuthenticationServerInterface;
+import com.example.greenstream.dialog.AppDialogBuilder;
 import com.example.greenstream.encryption.AppEncryptionManager;
+
+import java.util.Objects;
 
 public class AuthenticatorActivity extends AccountAuthenticatorActivity {
 
@@ -27,26 +35,72 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
     private EditText usernameEdit;
     private EditText passwordEdit;
 
+    private AuthenticationServerInterface authenticationServerInterface;
+    private Button loginButton;
+    private Button registerButton;
+    private ProgressBar loadingBar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_authenticator);
 
+        authenticationServerInterface = new DedicatedAuthenticationServerInterface(this);
+
         usernameEdit = findViewById(R.id.username_edit);
         passwordEdit = findViewById(R.id.password_edit);
-        Button loginButton = findViewById(R.id.login_button);
-        
+
+        loginButton = findViewById(R.id.login_button);
         loginButton.setOnClickListener(v -> submit());
+
+        registerButton = findViewById(R.id.register_button);
+        registerButton.setOnClickListener(v -> register());
+
+        loadingBar = findViewById(R.id.loading);
+
+        TextWatcher watcher = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                updateButtons();
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        };
+        usernameEdit.addTextChangedListener(watcher);
+        passwordEdit.addTextChangedListener(watcher);
+
+        updateButtons();
+    }
+
+    private void updateButtons() {
+        boolean enabled = !TextUtils.isEmpty(usernameEdit.getText().toString())
+                && !TextUtils.isEmpty(passwordEdit.getText().toString());
+        loginButton.setEnabled(enabled);
+        registerButton.setEnabled(enabled);
     }
 
     private void submit() {
         final String email = usernameEdit.getText().toString();
         final String password = passwordEdit.getText().toString();
+        login(email, password);
+    }
+
+    private void login(String email, String password) {
         final Intent res = new Intent();
         res.putExtra(AccountManager.KEY_ACCOUNT_NAME, email);
         res.putExtra(AccountManager.KEY_ACCOUNT_TYPE, AccountConstants.ACCOUNT_TYPE);
 
-        new DedicatedAuthenticationServerInterface(this).login(
+        loadingBar.setVisibility(View.VISIBLE);
+
+        authenticationServerInterface.login(
                 new Account(email, AccountConstants.ACCOUNT_TYPE),
                 password,
                 response -> {
@@ -55,9 +109,29 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
                     res.putExtras(data);
                     finishLogin(res);
                 },
-                error -> Log.e(TAG, error.getLocalizedMessage())    // TODO: proper error handling
+                error -> {
+                    Log.e(TAG, "Login failed with error: " + error.getLocalizedMessage());
+                    loadingBar.setVisibility(View.GONE);
+                }    // TODO: proper error handling
         );
+    }
 
+    private void register() {
+        final String email = usernameEdit.getText().toString();
+        final String password = passwordEdit.getText().toString();
+
+        AppDialogBuilder.registerDialog(this, (V) -> {
+            loadingBar.setVisibility(View.VISIBLE);
+            authenticationServerInterface.register(
+                    new Account(email, AccountConstants.ACCOUNT_TYPE),
+                    password,
+                    response -> login(email, password),
+                    error -> {
+                        Log.e(TAG, Objects.requireNonNull(error.getLocalizedMessage()));
+                        loadingBar.setVisibility(View.GONE);
+                    }    // TODO: proper error handling
+            );
+        }).show();
     }
 
     private void finishLogin(Intent intent) {

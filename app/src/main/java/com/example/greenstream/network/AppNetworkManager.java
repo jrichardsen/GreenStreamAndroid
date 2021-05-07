@@ -6,7 +6,6 @@ import android.util.Log;
 
 import androidx.lifecycle.MutableLiveData;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -23,9 +22,7 @@ import com.example.greenstream.data.Label;
 import com.example.greenstream.data.ListState;
 import com.example.greenstream.data.InformationItem;
 import com.example.greenstream.data.PersonalListType;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -69,6 +66,7 @@ public class AppNetworkManager implements AuthenticationServerInterface {
     private final String itemEndpoint;
     private final String labelsEndpoint;
     private final String feedbackEndpoint;
+    private final String registerEndpoint;
 
     public AppNetworkManager(@NotNull Context context) {
         allowMySSL(context);
@@ -83,6 +81,7 @@ public class AppNetworkManager implements AuthenticationServerInterface {
         itemEndpoint = context.getString(R.string.item_endpoint);
         labelsEndpoint = context.getString(R.string.labels_endpoint);
         feedbackEndpoint = context.getString(R.string.feedback_endpoint);
+        registerEndpoint = context.getString(R.string.register_endpoint);
     }
 
     /**
@@ -185,6 +184,27 @@ public class AppNetworkManager implements AuthenticationServerInterface {
                 listener,
                 errorListener);
         Log.d(TAG, "Sending network request to: " + url);
+        requestQueue.add(request);
+    }
+
+    @Override
+    public void register(Account account, String password, JsonRequest.ResponseListener<Void> listener, Response.ErrorListener errorListener) {
+        String url = serverUrl + registerEndpoint;
+        StringRequest request = new StringRequest(
+                Request.Method.POST,
+                url,
+                response -> listener.onResponseSuccess(null),
+                errorListener
+        ) {
+            @androidx.annotation.Nullable
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                params.put("email", account.name);
+                params.put("password", password);
+                return params;
+            }
+        };
         requestQueue.add(request);
     }
 

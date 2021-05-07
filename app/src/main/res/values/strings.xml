@@ -34,10 +34,12 @@
     <string name="labels_endpoint">/api/labels</string>
     <string name="feedback_endpoint">/api/feedback</string>
     <string name="login_endpoint">/login</string>
+    <string name="register_endpoint">/account</string>
     <string name="item_update_endpoint">/api/item/status</string>
     <string name="user_data_endpoint">/api/fullUser</string>
-    <string name="imprint_url">https://appsterdb.ackermann.digital/impressum</string>
-    <string name="about_us_url">https://appsterdb.ackermann.digital/about</string>
+    <string name="imprint_url">https://deingreenstream.de/impressum</string>
+    <string name="about_us_url">https://deingreenstream.de/about</string>
+    <string name="privacy_url">https://deingreenstream.de/privacy</string>
 
     <!-- Settings activity -->
     <string name="title_activity_settings">Einstellungen</string>
@@ -83,7 +85,9 @@
     <string name="feedback_received_failed">Feedback konnte nicht gesendet werden!</string>
     <string name="open_external">Im Browser öffnen</string>
 
-    <!-- Account activity -->
+    <!-- Authenticator activity -->
+    <string name="sign_in">Anmelden</string>
+    <string name="accept_privacy_agreement">Ich akzeptiere die <a href="https://deingreenstream.de/privacy">Datenschutzbestimmungen</a></string>
     <string name="email">Email</string>
     <string name="password">Passwort</string>
     <string name="login_failed">Anmeldung fehlgeschlagen!</string>

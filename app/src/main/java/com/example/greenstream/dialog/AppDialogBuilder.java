@@ -4,15 +4,23 @@ import android.accounts.Account;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.text.InputFilter;
 import android.text.InputType;
+import android.text.method.LinkMovementMethod;
+import android.text.util.Linkify;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.SwitchCompat;
 
 import com.example.greenstream.R;
 import com.example.greenstream.Repository;
@@ -90,6 +98,31 @@ public class AppDialogBuilder {
                 .setItems(items, (dialogInterface, i) ->
                         responseListener.onResponse((i < accounts.length) ? accounts[i] : null))
                 .create();
+    }
+
+    public static AlertDialog registerDialog(Context context, Repository.ResponseListener<Void> responseListener) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+
+        @SuppressLint("InflateParams")
+        FrameLayout view = (FrameLayout) LayoutInflater.from(context)
+                .inflate(R.layout.dialog_content_view_frame, null);
+        View privacySwitch = LayoutInflater.from(context)
+                .inflate(R.layout.privacy_switch, view);
+        ((TextView) privacySwitch.findViewById(R.id.privacy_text)).setMovementMethod(LinkMovementMethod.getInstance());
+
+        AlertDialog dialog = builder.setTitle(R.string.register)
+                .setView(view)
+                .setPositiveButton(android.R.string.ok, ((dialogInterface, i) -> responseListener.onResponse(null)))
+                .setNegativeButton(android.R.string.cancel, null)
+                .create();
+
+        ((SwitchCompat) privacySwitch.findViewById(R.id.privacy_switch))
+                .setOnCheckedChangeListener((compoundButton, b) ->
+                        dialog.getButton(DialogInterface.BUTTON_POSITIVE).setEnabled(b));
+        dialog.setOnShowListener(dialogInterface ->
+                dialog.getButton(DialogInterface.BUTTON_POSITIVE).setEnabled(false));
+
+        return dialog;
     }
 
     /**

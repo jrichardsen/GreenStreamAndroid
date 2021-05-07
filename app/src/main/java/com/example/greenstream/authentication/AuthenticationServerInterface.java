@@ -10,4 +10,8 @@ public interface AuthenticationServerInterface {
                String password,
                JsonRequest.ResponseListener<AppAccount> listener,
                Response.ErrorListener errorListener);
+    void register(Account account,
+                  String password,
+                  JsonRequest.ResponseListener<Void> listener,
+                  Response.ErrorListener errorListener);
 }

@@ -307,8 +307,10 @@ public class Repository {
         String encryptedPassword = accountManager.getPasswordForAccount(account);
         try {
             String password = encryptionManager.decryptMsg(context, encryptedPassword);
-            networkManager.login(account, password, this.account::setValue, null);
-            preferenceManager.updateAutoLoginAccountName(account.name);
+            networkManager.login(account, password, value -> {
+                this.account.setValue(value);
+                preferenceManager.updateAutoLoginAccountName(account.name);
+                }, null);   //TODO: add proper error listener
         } catch (Exception e) {
             Log.e(TAG, "Could not decrypt password", e);
         }
