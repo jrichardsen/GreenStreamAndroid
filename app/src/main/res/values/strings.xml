@@ -116,5 +116,6 @@
     <string name="account_activity_title">Account</string>
     <string name="username">Nutzername</string>
     <string name="add_account">Neuer Acccount</string>
+    <string name="privacy_agreement">Datenschutzbestimmungen</string>
 
 </resources>

@@ -38,5 +38,11 @@
                 android:action="android.intent.action.VIEW"
                 android:data="@string/imprint_url" />
         </Preference>
+
+        <Preference android:title="@string/privacy_agreement">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="@string/privacy_url" />
+        </Preference>
     </PreferenceCategory>
 </PreferenceScreen>
