@@ -117,5 +117,6 @@
     <string name="username">Nutzername</string>
     <string name="add_account">Neuer Acccount</string>
     <string name="privacy_agreement">Datenschutzbestimmungen</string>
+    <string name="intro">Einführung</string>
 
 </resources>

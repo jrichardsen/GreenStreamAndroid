@@ -192,7 +192,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.settings_nav_item) {
+        if (id == R.id.intro_nav_item) {
+            openIntro();
+            drawer.closeDrawer(GravityCompat.START);
+            return true;
+        } else if (id == R.id.settings_nav_item) {
             openSettings();
             drawer.closeDrawer(GravityCompat.START);
             return true;
@@ -213,6 +217,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             drawer.closeDrawer(GravityCompat.START);
             return true;
         }
+    }
+
+    private void openIntro() {
+        Log.d(TAG, "Launching intro");
+        Intent intent = new Intent(this, IntroActivity.class);
+        startActivity(intent);
     }
 
     /**

@@ -213,12 +213,17 @@ public class Repository {
     }
 
     public void notifyInformation() {
-        Account[] accounts = accountManager.getAccounts();
-        if (accounts.length > 0) {
-            String encryptedPassword = accountManager.getPasswordForAccount(accounts[0]);
+        String accessToken = tryGetAccessToken();
+        if (accessToken != null) {
+            networkManager.getRecommendation(accessToken, this::sendNotification);
+            return;
+        }
+        Account defaultAccount = getDefaultAccount();
+        if (defaultAccount != null) {
+            String encryptedPassword = accountManager.getPasswordForAccount(defaultAccount);
             try {
                 String password = encryptionManager.decryptMsg(context, encryptedPassword);
-                networkManager.login(accounts[0], password, account ->
+                networkManager.login(defaultAccount, password, account ->
                                 networkManager.getRecommendation(account.getAccessToken(), this::sendNotification),
                         error -> networkManager.getRecommendation(null, this::sendNotification));
             } catch (Exception e) {
@@ -264,19 +269,10 @@ public class Repository {
     }
 
     public void login(Activity activity, boolean onlyIfAvailable) {
+        Account defaultAccount = getDefaultAccount();
+        if (defaultAccount != null)
+            authenticateToAccount(defaultAccount);
         Account[] accounts = accountManager.getAccounts();
-        String accountName = preferenceManager.getAutoLoginAccountName();
-        if (accountName != null) {
-            Account account = null;
-            for (Account a : accounts) {
-                if (a.name.equals(accountName))
-                    account = a;
-            }
-            if (account != null) {
-                authenticateToAccount(account);
-                return;
-            }
-        }
         if (!onlyIfAvailable) {
             if (accounts.length == 0)
                 addNewAccount(activity);
@@ -292,6 +288,18 @@ public class Repository {
             }
 
         }
+    }
+
+    private Account getDefaultAccount() {
+        Account[] accounts = accountManager.getAccounts();
+        String accountName = preferenceManager.getAutoLoginAccountName();
+        if (accountName != null) {
+            for (Account a : accounts) {
+                if (a.name.equals(accountName))
+                    return a;
+            }
+        }
+        return null;
     }
 
     private void addNewAccount(Activity activity) {

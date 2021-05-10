@@ -21,7 +21,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activities.ItemListActivity"></activity>
+        <activity android:name=".activities.IntroActivity" />
+        <activity android:name=".activities.ItemListActivity" />
 
         <service
             android:name=".authentication.GreenstreamAuthenticatorService"

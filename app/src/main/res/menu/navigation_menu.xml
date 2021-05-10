@@ -24,6 +24,10 @@
     </group>
     <group android:id="@+id/nav_group_others">
         <item
+            android:id="@+id/intro_nav_item"
+            android:icon="@drawable/ic_baseline_info_24"
+            android:title="@string/intro" />
+        <item
             android:id="@+id/settings_nav_item"
             android:icon="@drawable/ic_settings_white_24dp"
             android:title="@string/title_activity_settings" />
