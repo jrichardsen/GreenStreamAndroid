@@ -3,12 +3,14 @@ package com.example.greenstream.network;
 import android.accounts.Account;
 import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.lifecycle.MutableLiveData;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.greenstream.R;
@@ -50,11 +52,12 @@ import javax.net.ssl.TrustManagerFactory;
 public class AppNetworkManager implements AuthenticationServerInterface {
 
     private static final String TAG = "AppNetworkManager";
-    private static final Response.ErrorListener errorListener =
-            error -> Log.e(TAG, "Error with Network Request", error);
+    private final Response.ErrorListener errorListener =
+            this::onErrorResponse;
 
     private static final String FEED_REQUEST_TAG = "FEED_REQUEST";
 
+    private final Context context;
     private final RequestQueue requestQueue;
     private final String serverUrl;
     private final String feedEndpoint;
@@ -69,6 +72,7 @@ public class AppNetworkManager implements AuthenticationServerInterface {
     private final String registerEndpoint;
 
     public AppNetworkManager(@NotNull Context context) {
+        this.context = context;
         allowMySSL(context);
         requestQueue = Volley.newRequestQueue(context.getApplicationContext());
         serverUrl = context.getString(R.string.server_url);
@@ -88,12 +92,12 @@ public class AppNetworkManager implements AuthenticationServerInterface {
      * Requests a number of items from the server.
      * These items will extend or replace the list of currently loaded items in the given feed.
      *
-     * @param feed        The live data for the result of the request
-     * @param feedState   Updates the feed state when beginning and ending loading, will not check
-     *                    the feedback state based on loading items
-     * @param amount      The amount of items to load
-     * @param position    The amount of the last loaded item. If this is zero, a new feed will
-     *                    be requested and overwrite any previous data.
+     * @param feed      The live data for the result of the request
+     * @param feedState Updates the feed state when beginning and ending loading, will not check
+     *                  the feedback state based on loading items
+     * @param amount    The amount of items to load
+     * @param position  The amount of the last loaded item. If this is zero, a new feed will
+     *                  be requested and overwrite any previous data.
      */
     public void requestFeed(MutableLiveData<List<InformationItem>> feed,
                             MutableLiveData<ListState> feedState,
@@ -146,8 +150,7 @@ public class AppNetworkManager implements AuthenticationServerInterface {
                     }
                     List<T> data = items.getValue();
 
-                    if (start == 0 || data == null) {data = response;}
-                    else {data.addAll(response);}
+                    if (start == 0 || data == null) {data = response;} else {data.addAll(response);}
                     items.setValue(data);
                 },
                 error -> {
@@ -175,7 +178,7 @@ public class AppNetworkManager implements AuthenticationServerInterface {
                       Response.ErrorListener errorListener) {
         String url = serverUrl + loginEndpoint;
         if (errorListener == null)
-            errorListener = AppNetworkManager.errorListener;
+            errorListener = this.errorListener;
         AuthenticationRequest request = new AuthenticationRequest(
                 Request.Method.POST,
                 url,
@@ -196,7 +199,6 @@ public class AppNetworkManager implements AuthenticationServerInterface {
                 response -> listener.onResponseSuccess(null),
                 errorListener
         ) {
-            @androidx.annotation.Nullable
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<>();
@@ -221,9 +223,9 @@ public class AppNetworkManager implements AuthenticationServerInterface {
     }
 
     private void updateInformationProperty(long itemId,
-                                          String updatePropertyEndpoint,
-                                          boolean value,
-                                          @NotNull String accessToken) {
+                                           String updatePropertyEndpoint,
+                                           boolean value,
+                                           @NotNull String accessToken) {
         String url = serverUrl + updatePropertyEndpoint + "/" + itemId;
         int requestMethod = value ? Request.Method.PUT : Request.Method.DELETE;
         StringRequest request = new AuthenticatedStringRequest(requestMethod,
@@ -366,5 +368,10 @@ public class AppNetworkManager implements AuthenticationServerInterface {
                 KeyStoreException e) {
             Log.e(TAG, "Allowing custom SSL failed with error", e);
         }
+    }
+
+    private void onErrorResponse(VolleyError error) {
+        Log.e(TAG, "Error with Network Request", error);
+        Toast.makeText(context, R.string.network_request_failed, Toast.LENGTH_SHORT).show();
     }
 }
