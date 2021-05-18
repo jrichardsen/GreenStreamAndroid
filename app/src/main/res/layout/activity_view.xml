@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.ViewActivity">
+    tools:context="de.deingreenstream.app.activities.ViewActivity">
 
     <TextView
         android:id="@+id/url_text"

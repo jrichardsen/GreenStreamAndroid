@@ -7,7 +7,7 @@
             android:summary="@string/daily_notification_pref_summary"
             android:title="@string/daily_notification_pref_title" />
 
-        <com.example.greenstream.preferences.TimePreference
+        <de.deingreenstream.app.preferences.TimePreference
             android:defaultValue="12:00"
             android:dependency="@string/daily_notification_pref_key"
             android:key="@string/notification_time_pref_key"
