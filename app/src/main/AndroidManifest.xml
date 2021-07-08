@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.greenstream">
+    package="de.deingreenstream.app">
 
     <uses-permission
         android:name="android.permission.AUTHENTICATE_ACCOUNTS"
@@ -21,11 +21,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="de.deingreenstream.app.activities.IntroActivity" />
-        <activity android:name="de.deingreenstream.app.activities.ItemListActivity" />
+        <activity android:name=".activities.IntroActivity" />
+        <activity android:name=".activities.ItemListActivity" />
 
         <service
-            android:name="de.deingreenstream.app.authentication.GreenstreamAuthenticatorService"
+            android:name=".authentication.GreenstreamAuthenticatorService"
             android:enabled="true"
             android:exported="false">
             <intent-filter>
@@ -37,7 +37,7 @@
                 android:resource="@xml/authenticator" />
         </service>
 
-        <activity android:name="de.deingreenstream.app.activities.MainActivity">
+        <activity android:name=".activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -45,27 +45,27 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="de.deingreenstream.app.activities.AccountActivity"
+            android:name=".activities.AccountActivity"
             android:windowSoftInputMode="stateHidden">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="de.deingreenstream.app.activities.MainActivity" />
+                android:value=".activities.MainActivity" />
         </activity>
-        <activity android:name="de.deingreenstream.app.activities.AuthenticatorActivity" />
-        <activity android:name="de.deingreenstream.app.activities.ViewActivity" />
+        <activity android:name=".activities.AuthenticatorActivity" />
+        <activity android:name=".activities.ViewActivity" />
         <activity
-            android:name="de.deingreenstream.app.activities.SettingsActivity"
+            android:name=".activities.SettingsActivity"
             android:label="@string/title_activity_settings" />
 
         <receiver
-            android:name="de.deingreenstream.app.alarm.AppAlarmManager"
+            android:name=".alarm.AppAlarmManager"
             android:enabled="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
-        <receiver android:name="de.deingreenstream.app.alarm.AlarmReceiver" />
-        <receiver android:name="de.deingreenstream.app.notifications.NotificationActionReceiver" />
+        <receiver android:name=".alarm.AlarmReceiver" />
+        <receiver android:name=".notifications.NotificationActionReceiver" />
     </application>
 
 </manifest>
