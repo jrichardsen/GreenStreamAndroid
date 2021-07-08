@@ -16,7 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.example.greenstream.R;
+import de.deingreenstream.app.R;
 import de.deingreenstream.app.data.ExtendedInformationItem;
 import de.deingreenstream.app.data.InformationItem;
 import de.deingreenstream.app.viewmodels.ViewViewModel;

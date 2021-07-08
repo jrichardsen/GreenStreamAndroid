@@ -10,7 +10,7 @@ import com.android.volley.Response;
 import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.example.greenstream.R;
+import de.deingreenstream.app.R;
 import de.deingreenstream.app.network.AppNetworkManager;
 import de.deingreenstream.app.network.JsonRequest;
 

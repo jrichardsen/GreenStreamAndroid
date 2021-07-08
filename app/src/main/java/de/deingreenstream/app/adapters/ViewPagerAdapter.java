@@ -10,7 +10,7 @@ import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.viewpager.widget.PagerAdapter;
 
-import com.example.greenstream.R;
+import de.deingreenstream.app.R;
 
 import org.jetbrains.annotations.NotNull;
 

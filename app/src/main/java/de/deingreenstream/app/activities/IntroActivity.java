@@ -5,7 +5,7 @@ import androidx.viewpager.widget.ViewPager;
 
 import android.os.Bundle;
 
-import com.example.greenstream.R;
+import de.deingreenstream.app.R;
 import de.deingreenstream.app.adapters.ViewPagerAdapter;
 import com.google.android.material.tabs.TabLayout;
 

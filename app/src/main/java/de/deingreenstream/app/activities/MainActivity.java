@@ -22,7 +22,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.example.greenstream.R;
+import de.deingreenstream.app.R;
 import de.deingreenstream.app.adapters.InformationAdapter;
 import de.deingreenstream.app.authentication.AppAccount;
 import de.deingreenstream.app.data.ExtendedInformationItem;

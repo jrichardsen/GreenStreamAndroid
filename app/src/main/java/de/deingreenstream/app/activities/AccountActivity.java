@@ -1,8 +1,5 @@
 package de.deingreenstream.app.activities;
 
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -19,11 +16,14 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.example.greenstream.R;
-import de.deingreenstream.app.authentication.AppAccount;
-import de.deingreenstream.app.data.SelectableTopic;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.List;
+
+import de.deingreenstream.app.R;
+import de.deingreenstream.app.authentication.AppAccount;
+import de.deingreenstream.app.data.SelectableTopic;
 
 public class AccountActivity extends AppCompatActivity {
 

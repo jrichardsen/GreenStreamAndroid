@@ -11,7 +11,7 @@ import androidx.fragment.app.DialogFragment;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
-import com.example.greenstream.R;
+import de.deingreenstream.app.R;
 import de.deingreenstream.app.preferences.TimePreference;
 import de.deingreenstream.app.preferences.TimePreferenceDialogFragmentCompat;
 

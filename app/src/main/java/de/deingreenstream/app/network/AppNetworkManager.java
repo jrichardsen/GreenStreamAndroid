@@ -14,7 +14,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.example.greenstream.R;
+import de.deingreenstream.app.R;
 import de.deingreenstream.app.Repository;
 import de.deingreenstream.app.authentication.AppAccount;
 import de.deingreenstream.app.authentication.AuthenticationRequest;

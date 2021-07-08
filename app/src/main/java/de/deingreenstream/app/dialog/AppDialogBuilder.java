@@ -19,7 +19,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.SwitchCompat;
 
-import com.example.greenstream.R;
+import de.deingreenstream.app.R;
 import de.deingreenstream.app.Repository;
 import de.deingreenstream.app.data.Feedback;
 import de.deingreenstream.app.data.Label;

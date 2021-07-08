@@ -2,7 +2,7 @@ package de.deingreenstream.app.data;
 
 import androidx.annotation.StringRes;
 
-import com.example.greenstream.R;
+import de.deingreenstream.app.R;
 
 public enum PersonalListType {
 

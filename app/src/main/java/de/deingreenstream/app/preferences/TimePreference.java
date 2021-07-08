@@ -8,7 +8,7 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 import androidx.preference.DialogPreference;
 
-import com.example.greenstream.R;
+import de.deingreenstream.app.R;
 
 import org.jetbrains.annotations.NotNull;
 

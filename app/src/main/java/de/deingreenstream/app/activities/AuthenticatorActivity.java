@@ -14,7 +14,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 
-import com.example.greenstream.R;
+import de.deingreenstream.app.R;
 import de.deingreenstream.app.authentication.AccountConstants;
 import de.deingreenstream.app.authentication.AuthenticationServerInterface;
 import de.deingreenstream.app.authentication.DedicatedAuthenticationServerInterface;

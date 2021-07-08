@@ -14,7 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
-import com.example.greenstream.R;
+import de.deingreenstream.app.R;
 import de.deingreenstream.app.adapters.InformationAdapter;
 import de.deingreenstream.app.data.ExtendedInformationItem;
 import de.deingreenstream.app.data.ListState;

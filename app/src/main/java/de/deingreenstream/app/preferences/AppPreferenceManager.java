@@ -6,12 +6,12 @@ import android.util.Log;
 
 import androidx.preference.PreferenceManager;
 
-import com.example.greenstream.R;
-
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
 import java.util.Random;
+
+import de.deingreenstream.app.R;
 
 /**
  * Class for managing the app's {@link SharedPreferences}.

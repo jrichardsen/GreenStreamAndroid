@@ -17,7 +17,7 @@ import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.example.greenstream.R;
+import de.deingreenstream.app.R;
 
 import org.jetbrains.annotations.NotNull;
 
