@@ -8,8 +8,18 @@ import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.work.Constraints;
+import androidx.work.Data;
+import androidx.work.NetworkType;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
+import androidx.work.Worker;
+import androidx.work.WorkerParameters;
+
+import org.jetbrains.annotations.NotNull;
 
 import de.deingreenstream.app.activities.ViewActivity;
 import de.deingreenstream.app.alarm.AppAlarmManager;
@@ -215,7 +225,7 @@ public class Repository {
     public void notifyInformation() {
         String accessToken = tryGetAccessToken();
         if (accessToken != null) {
-            networkManager.getRecommendation(accessToken, this::sendNotification);
+            getRecommendationAndSendNotification(accessToken);
             return;
         }
         Account defaultAccount = getDefaultAccount();
@@ -224,15 +234,27 @@ public class Repository {
             try {
                 String password = encryptionManager.decryptMsg(context, encryptedPassword);
                 networkManager.login(defaultAccount, password, account ->
-                                networkManager.getRecommendation(account.getAccessToken(), this::sendNotification),
-                        error -> networkManager.getRecommendation(null, this::sendNotification));
+                        getRecommendationAndSendNotification(account.getAccessToken()),
+                        error -> getRecommendationAndSendNotification(null));
             } catch (Exception e) {
                 Log.e(TAG, "Could not decrypt password", e);
-                networkManager.getRecommendation(null, this::sendNotification);
+                getRecommendationAndSendNotification(null);
             }
         } else {
-            networkManager.getRecommendation(null, this::sendNotification);
+            getRecommendationAndSendNotification(null);
         }
+    }
+
+    private void getRecommendationAndSendNotification(String accessToken) {
+        WorkManager.getInstance(context)
+                .enqueue(new OneTimeWorkRequest.Builder(RecommendationWorker.class)
+                        .setInputData(new Data.Builder()
+                                .putString(RecommendationWorker.TOKEN_KEY, accessToken)
+                                .build())
+                        .setConstraints(new Constraints.Builder()
+                                .setRequiredNetworkType(NetworkType.CONNECTED)
+                                .build())
+                        .build());
     }
 
     private void sendNotification(InformationItem informationItem) {
@@ -318,7 +340,7 @@ public class Repository {
             networkManager.login(account, password, value -> {
                 this.account.setValue(value);
                 preferenceManager.updateAutoLoginAccountName(account.name);
-                }, null);   //TODO: add proper error listener
+            }, null);   //TODO: add proper error listener
         } catch (Exception e) {
             Log.e(TAG, "Could not decrypt password", e);
         }
@@ -369,5 +391,25 @@ public class Repository {
         void onFeedbackReceivedSuccess();
 
         void onFeedbackFailed();
+    }
+
+    public class RecommendationWorker extends Worker {
+
+        public static final String TOKEN_KEY = "TOKEN_KEY";
+
+        private final String token;
+
+        public RecommendationWorker(@NonNull @NotNull Context context, @NonNull @NotNull WorkerParameters workerParams) {
+            super(context, workerParams);
+            token = workerParams.getInputData().getString(TOKEN_KEY);
+        }
+
+        @NonNull
+        @NotNull
+        @Override
+        public Result doWork() {
+            networkManager.getRecommendation(token, Repository.this::sendNotification);
+            return Result.success();
+        }
     }
 }
